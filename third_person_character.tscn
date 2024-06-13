@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://bkee16cpy3j8y"]
+
+[ext_resource type="Script" path="res://character_controller.gd" id="1_k51kk"]
+[ext_resource type="Script" path="res://follow_camera.gd" id="2_jr8w2"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cbbcf"]
+
+[node name="CharacterBody3D" type="CharacterBody3D"]
+script = ExtResource("1_k51kk")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+
+[node name="camera" type="Camera3D" parent="."]
+script = ExtResource("2_jr8w2")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_cbbcf")

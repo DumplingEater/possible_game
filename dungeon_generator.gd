@@ -7,6 +7,8 @@ extends Node3D
 @export var room_count: int = 15
 @export var max_iterations: int = 100000
 
+var char_spawn_point: Vector3 = Vector3.ZERO
+
 class RoomNode:
 	var x: int = 0
 	var y: int = 0
@@ -44,6 +46,9 @@ class RoomNode:
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	char_spawn_point = Vector3.ZERO
+	var spawn_set = false
+	
 	var rng = RandomNumberGenerator.new()
 	var rooms = []
 	var iterations = 0
@@ -63,7 +68,6 @@ func _ready():
 			rooms.append(candidate_room)
 			var printer = "Adding room with x %d y %d dx %d dy %d"
 			var formatted = printer % [candidate_room.x, candidate_room.y, candidate_room.width, candidate_room.depth]
-			print(formatted)
 		iterations += 1
 		if iterations >= max_iterations:
 			break
@@ -78,11 +82,22 @@ func _ready():
 
 		# Set the position of the cube
 		mesh_instance.position = Vector3(room.x, 0.0, room.y)
-
+		mesh_instance.create_convex_collision()
+		
+		if not spawn_set:
+			char_spawn_point = mesh_instance.position + Vector3(0, 5, 0)
+			spawn_set = true
+		
 		# Add the cube to the scene
 		add_child(mesh_instance)
+	
+	var character = get_node("../../character")
+	character.ready.connect(_set_player_spawn)
 
-
+func _set_player_spawn():
+	var character = get_node("../../character")
+	character.transform = character.transform.translated(char_spawn_point)
+	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	pass
