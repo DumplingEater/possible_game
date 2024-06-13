@@ -1,0 +1,25 @@
+[gd_scene load_steps=3 format=3 uid="uid://cx6470uohatbh"]
+
+[ext_resource type="Script" path="res://dungeon_generator.gd" id="1_a402x"]
+[ext_resource type="Script" path="res://custom_camera_controller.gd" id="2_7fqja"]
+
+[node name="root" type="Node3D"]
+
+[node name="scene" type="Node3D" parent="."]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="scene"]
+sky_mode = 1
+
+[node name="Node3D2" type="Node3D" parent="scene"]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="scene/Node3D2"]
+
+[node name="dungeon" type="Node3D" parent="."]
+
+[node name="dungeon_spawner" type="Node3D" parent="dungeon"]
+script = ExtResource("1_a402x")
+
+[node name="camera" type="Node3D" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="camera"]
+script = ExtResource("2_7fqja")
