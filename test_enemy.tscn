@@ -1,0 +1,23 @@
+[gd_scene load_steps=5 format=3 uid="uid://sg6ymqcxjcct"]
+
+[ext_resource type="Script" path="res://src/state_machines/guard_state_machine.gd" id="1_e44qv"]
+[ext_resource type="Script" path="res://mob_rigidbody.gd" id="2_ydxx1"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_hnul1"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_btp1y"]
+
+[node name="TestEnemy" type="Node3D"]
+
+[node name="enemy_behavior" type="Node" parent="."]
+script = ExtResource("1_e44qv")
+
+[node name="body_3d" type="CharacterBody3D" parent="."]
+script = ExtResource("2_ydxx1")
+
+[node name="collision_shape_3d" type="CollisionShape3D" parent="body_3d"]
+shape = SubResource("CylinderShape3D_hnul1")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="body_3d"]
+mesh = SubResource("CylinderMesh_btp1y")
+skeleton = NodePath("../..")

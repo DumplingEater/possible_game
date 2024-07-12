@@ -98,6 +98,15 @@ func _set_player_spawn():
 	var character = get_node("../../character")
 	character.transform = character.transform.translated(char_spawn_point)
 	
+	var test_enemy = preload("res://test_enemy.tscn")
+	var instance =  test_enemy.instantiate()
+	instance.transform.origin = Vector3(char_spawn_point.x + 6, 5, char_spawn_point.z)
+	get_node("/root").print_tree_pretty()
+	var chars_node = get_node("../../characters")
+	chars_node.add_child(instance)
+	get_node("/root").print_tree_pretty()
+	return
+	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	pass

@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://bkee16cpy3j8y"]
+[gd_scene load_steps=5 format=3 uid="uid://bkee16cpy3j8y"]
 
 [ext_resource type="Script" path="res://character_controller.gd" id="1_k51kk"]
 [ext_resource type="Script" path="res://follow_camera.gd" id="2_jr8w2"]
+[ext_resource type="Script" path="res://src/player_character.gd" id="3_co36e"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cbbcf"]
 
@@ -15,3 +16,6 @@ script = ExtResource("2_jr8w2")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape3D_cbbcf")
+
+[node name="data" type="Node" parent="."]
+script = ExtResource("3_co36e")
