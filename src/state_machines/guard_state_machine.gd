@@ -4,6 +4,14 @@ extends Node
 var current_state = null
 var states = {}
 
+"""
+Notes on this:
+	I am starting to wonder if states should be nodes and then the state machine
+	basically just links the nodes to each other.
+	also state machines operate on a block so this thing should probably have a reference
+	to the data class.
+"""
+
 func _ready():
 	print('starting state machine')
 	states["idle"] = preload("res://src/state_machines/idle_state.gd").new()
