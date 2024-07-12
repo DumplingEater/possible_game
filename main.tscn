@@ -13,6 +13,10 @@ sky_mode = 1
 
 [node name="dungeon" parent="." instance=ExtResource("1_n2dcx")]
 
-[node name="character" parent="." instance=ExtResource("2_8juhv")]
+[node name="agents" type="Node" parent="."]
 
-[node name="characters" type="Node" parent="."]
+[node name="mobs" type="Node" parent="agents"]
+
+[node name="players" type="Node" parent="agents"]
+
+[node name="character" parent="agents/players" instance=ExtResource("2_8juhv")]
