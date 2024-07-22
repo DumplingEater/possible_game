@@ -1,21 +1,22 @@
 [gd_scene load_steps=5 format=3 uid="uid://bkee16cpy3j8y"]
 
-[ext_resource type="Script" path="res://src/character_controller.gd" id="1_k51kk"]
-[ext_resource type="Script" path="res://src/follow_camera.gd" id="2_jr8w2"]
-[ext_resource type="Script" path="res://src/player_character.gd" id="3_co36e"]
+[ext_resource type="Script" path="res://src/player_controls/character_controller.gd" id="1_vvahs"]
+[ext_resource type="Script" path="res://src/player_controls/follow_camera.gd" id="2_5oxlu"]
+[ext_resource type="Script" path="res://src/player_controls/player_character.gd" id="3_xhcw4"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cbbcf"]
 
 [node name="CharacterBody3D" type="CharacterBody3D"]
-script = ExtResource("1_k51kk")
+script = ExtResource("1_vvahs")
+speed = 23
 
 [node name="CSGBox3D" type="CSGBox3D" parent="."]
 
 [node name="camera" type="Camera3D" parent="."]
-script = ExtResource("2_jr8w2")
+script = ExtResource("2_5oxlu")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape3D_cbbcf")
 
 [node name="data" type="Node" parent="."]
-script = ExtResource("3_co36e")
+script = ExtResource("3_xhcw4")
