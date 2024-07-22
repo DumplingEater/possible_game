@@ -35,6 +35,6 @@ script = ExtResource("2_8tgej")
 [node name="collision_shape_3d" type="CollisionShape3D" parent="body_3d"]
 shape = SubResource("CylinderShape3D_hnul1")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="body_3d"]
+[node name="mesh_3d" type="MeshInstance3D" parent="body_3d"]
 mesh = SubResource("CylinderMesh_btp1y")
 skeleton = NodePath("../..")
