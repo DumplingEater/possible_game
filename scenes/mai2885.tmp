@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://cx6470uohatbh"]
 
-[ext_resource type="PackedScene" uid="uid://b5jpr0o1187hx" path="res://dungeon_level.tscn" id="1_n2dcx"]
-[ext_resource type="PackedScene" uid="uid://bkee16cpy3j8y" path="res://third_person_character.tscn" id="2_8juhv"]
+[ext_resource type="PackedScene" uid="uid://b5jpr0o1187hx" path="res://scenes/dungeon_level.tscn" id="1_n2dcx"]
+[ext_resource type="PackedScene" uid="uid://bkee16cpy3j8y" path="res://scenes/third_person_character.tscn" id="2_8juhv"]
 
 [node name="main" type="Node3D"]
 

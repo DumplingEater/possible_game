@@ -1,15 +1,15 @@
 # moving.gd
 extends State
 
-class_name Moving
+class_name ChaseState
 
 var speed = 0.1
 var target = null
 
 func enter():
-	print("Entering Moving State")
+	print("Entering Chase State")
 
-func update(delta):
+func process_state(delta):
 	if target == null:
 		state_machine.change_state("idle")
 		return 

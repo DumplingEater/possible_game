@@ -1,31 +1,22 @@
 # state_machine.gd
-extends Node
+extends StateMachine
 
-var current_state = null
-var states = {}
 
-"""
-Notes on this:
-	I am starting to wonder if states should be nodes and then the state machine
-	basically just links the nodes to each other.
-	also state machines operate on a block so this thing should probably have a reference
-	to the data class.
-"""
+var max_chase_distance: float = 10
+var range_of_regard: float = 15
+var attack_range: float = 5
+
+var speed: float = 3
+var original_position: Vector3 = Vector3(0, 0, 0)
+var target: CharacterBody3D = null
+var agent_body: CharacterBody3D = null
 
 func _ready():
-	print('starting state machine')
-	states["idle"] = preload("res://src/state_machines/idle_state.gd").new()
-	states["chase"] = preload("res://src/state_machines/chase_state.gd").new()
-	for state in states.values():
-		state.state_machine = self
-	change_state("idle")
+	super._ready()
+	var start_pos = get_parent().global_transform.origin
+	original_position = Vector3(start_pos.x, 0.0, start_pos.z)
+	agent_body = get_parent().get_node("body_3d")
 
-func change_state(new_state_name):
-	if current_state != null:
-		current_state.exit()
-	current_state = states[new_state_name]
-	current_state.enter()
-
-func _process(delta):
-	if current_state != null:
-		current_state.update(delta)
+func distance_to_target():
+	var distance = agent_body.global_transform.origin.distance_to(target.global_transform.origin)
+	return distance
