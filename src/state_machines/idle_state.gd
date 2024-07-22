@@ -13,7 +13,7 @@ func process_state(delta):
 	var closest_character = get_closest_character()
 	if closest_character != null:
 		state_machine.change_state("chase")
-		state_machine.target = closest_character.get_parent()
+		state_machine.target = closest_character.get_parent().get_node("body_3d")
 
 func get_closest_character():
 	if not state_machine.is_inside_tree():
@@ -23,7 +23,7 @@ func get_closest_character():
 	var characters = state_machine.get_tree().get_nodes_in_group("players")
 	for character in characters:
 		if character != self: # Avoid checking distance to itself
-			var distance = state_machine.get_parent().transform.origin.distance_to(character.get_parent().transform.origin)
+			var distance = state_machine.get_parent().global_transform.origin.distance_to(character.get_parent().get_node("body_3d").global_transform.origin)
 			if distance < min_distance and distance < state_machine.range_of_regard:
 				min_distance = distance
 				closest_character = character

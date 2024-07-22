@@ -1,0 +1,38 @@
+[gd_scene load_steps=7 format=3 uid="uid://bablflwgqpj8o"]
+
+[ext_resource type="Shader" path="res://resources/shaders/fireball.gdshader" id="1_24h4f"]
+[ext_resource type="Script" path="res://src/spell_projectile_data.gd" id="1_emk6e"]
+[ext_resource type="Script" path="res://src/spell_projectile_motion.gd" id="1_jbg6e"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_mty2v"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1llo4"]
+render_priority = 0
+shader = ExtResource("1_24h4f")
+shader_parameter/emission_intensity = 2.0
+shader_parameter/time_scale = 3.0
+shader_parameter/texture_scale = Vector2(1, 1)
+shader_parameter/edge_softness = 0.1
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_cs7fl"]
+material = SubResource("ShaderMaterial_1llo4")
+radius = 0.25
+height = 0.5
+
+[node name="Fireball" type="Node3D"]
+script = ExtResource("1_emk6e")
+speed = 25.0
+
+[node name="Area3D" type="Area3D" parent="."]
+script = ExtResource("1_jbg6e")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("SphereShape3D_mty2v")
+
+[node name="mesh" type="MeshInstance3D" parent="Area3D"]
+mesh = SubResource("CapsuleMesh_cs7fl")
+skeleton = NodePath("../..")
+
+[node name="light_emitter" type="OmniLight3D" parent="Area3D"]
+light_color = Color(0.962611, 0.202223, 0, 1)
+light_energy = 0.553

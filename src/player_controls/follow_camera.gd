@@ -6,12 +6,34 @@ extends Camera3D
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	transform = transform.translated(Vector3(10, 10, 10))
+	transform = transform.translated(Vector3(0, 10, 10))
 	transform = transform.looking_at(Vector3(0, 0, 0))
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	pass
+	var parent_body: CharacterBody3D = get_parent()
+	if Input.is_action_pressed("move_forward"):
+		var left_mouse = Input.is_action_pressed("mouse_left_click")
+		var right_mouse = Input.is_action_pressed("mouse_right_click")
+		
+		if not (left_mouse or right_mouse):
+			
+			var player_direction: Vector3 = parent_body.global_transform.basis.z.normalized()
+			var cam_forward: Vector3 = self.global_transform.basis.z
+			
+			var cam_dir_proj: Vector3 = Vector3(cam_forward.x, 0.0, cam_forward.z)
+			var player_dir_proj: Vector3 = Vector3(player_direction.x, 0.0, player_direction.z)
+			
+			
+			var angle_between: float = cam_dir_proj.signed_angle_to(player_dir_proj, Vector3(0, 1, 0))
+			
+			var rot_y = Quaternion(Vector3(0, 1, 0), angle_between * 0.05)
+			var pos_norm = transform.origin.normalized()
+			var rotated = rot_y * pos_norm
+			var rotated_and_scaled = rotated * transform.origin.length()
+			var offset = rotated_and_scaled - transform.origin
+			transform = transform.translated(offset)
+			transform = transform.looking_at(Vector3(0, 0, 0))
 
 func _input(event):
 	if Input.is_action_pressed("scroll_down"):
@@ -19,11 +41,14 @@ func _input(event):
 	if Input.is_action_pressed("scroll_up"):
 		transform = transform.scaled(Vector3(0.9, 0.9, 0.9))		
 	
-	if Input.is_action_pressed("mouse_right_click"):
+	if Input.is_action_pressed("mouse_left_click") or Input.is_action_pressed("mouse_right_click"):
 		if event is InputEventMouseMotion:
 			# Get the mouse motion in the horizontal direction
 			var delta_x = -event.relative.x * mouse_sensitivity
 			var delta_y = -event.relative.y * mouse_sensitivity
+			
+			if not Input.is_action_pressed("mouse_left_click"):
+				delta_x = 0
 			
 			# Create a quaternion for the rotation around the Y-axis (up vector)
 			var rot_about_y = Quaternion(Vector3(0, 1, 0), delta_x)

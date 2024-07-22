@@ -9,16 +9,13 @@ var states = {}
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	super._ready()
 	get_states_from_children()
 	if initial_state != null:
 		change_state(initial_state.name)
 	else:
 		push_error("State machine on ", get_parent().name, " had no initial state.")
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	if  current_state != null:
-		current_state.process_state(delta)
 
 func change_state(new_state_name: String):
 	if current_state != null:
@@ -38,6 +35,9 @@ func get_states_from_children():
 		var state = states[state_name]
 		print("state_name: ", state_name, " value: ", state)
 
+func process_current_state(delta):
+	if current_state != null:
+		current_state.process_state(delta)
 
 # methods on state.
 #func enter():

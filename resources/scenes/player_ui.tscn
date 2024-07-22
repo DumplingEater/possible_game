@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3 uid="uid://bj2fkhwbgremr"]
+
+[ext_resource type="Script" path="res://resources/scenes/player_status_ui.gd" id="1_0bmg4"]
+
+[node name="PlayerUi" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="health_label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 27.0
+offset_top = 26.0
+offset_right = 224.0
+offset_bottom = 53.0
+text = "Health:"
+script = ExtResource("1_0bmg4")
+
+[node name="health_bar" type="ProgressBar" parent="health_label"]
+layout_mode = 0
+offset_left = 58.0
+offset_top = 2.0
+offset_right = 257.0
+offset_bottom = 22.0
+show_percentage = false

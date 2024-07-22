@@ -8,6 +8,7 @@ func enter():
 
 func process_state(delta):
 	if state_machine.target == null:
+		push_warning("Null Target")
 		state_machine.change_state("idle")
 		return 
 	
@@ -23,13 +24,13 @@ func process_state(delta):
 	
 	# check if we're  too far from the target now
 	if distance > state_machine.range_of_regard:
-		state_machine.change_state("idle")
-		state_machine.agent_body.set_velocity(Vector3(0, 0, 0))
+		state_machine.change_state("return_to_origin")
 		return
 	
 	# see if we're at attack range
 	if distance <= state_machine.attack_range:
 		state_machine.change_state("engage")
+		state_machine.current_state.target = state_machine.target
 		state_machine.agent_body.set_velocity(Vector3(0, 0, 0))
 		return
 	

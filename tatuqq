@@ -1,0 +1,295 @@
+[1mdiff --git a/project.godot b/project.godot[m
+[1mindex 698281c..81e426a 100644[m
+[1m--- a/project.godot[m
+[1m+++ b/project.godot[m
+[36m@@ -18,12 +18,12 @@[m [mconfig/features=PackedStringArray("4.2", "Forward Plus")[m
+ [m
+ move_left={[m
+ "deadzone": 0.5,[m
+[31m-"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":65,"key_label":0,"unicode":97,"echo":false,"script":null)[m
+[32m+[m[32m"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":81,"key_label":0,"unicode":113,"echo":false,"script":null)[m
+ ][m
+ }[m
+ move_right={[m
+ "deadzone": 0.5,[m
+[31m-"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":68,"key_label":0,"unicode":100,"echo":false,"script":null)[m
+[32m+[m[32m"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":69,"key_label":0,"unicode":101,"echo":false,"script":null)[m
+ ][m
+ }[m
+ move_forward={[m
+[36m@@ -56,3 +56,18 @@[m [mscroll_down={[m
+ "events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":0,"position":Vector2(0, 0),"global_position":Vector2(0, 0),"factor":1.0,"button_index":5,"canceled":false,"pressed":false,"double_click":false,"script":null)[m
+ ][m
+ }[m
+[32m+[m[32mmouse_left_click={[m
+[32m+[m[32m"deadzone": 0.5,[m
+[32m+[m[32m"events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":1,"position":Vector2(139, 21),"global_position":Vector2(143, 62),"factor":1.0,"button_index":1,"canceled":false,"pressed":true,"double_click":false,"script":null)[m
+[32m+[m[32m][m
+[32m+[m[32m}[m
+[32m+[m[32mturn_left={[m
+[32m+[m[32m"deadzone": 0.5,[m
+[32m+[m[32m"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":65,"key_label":0,"unicode":97,"echo":false,"script":null)[m
+[32m+[m[32m][m
+[32m+[m[32m}[m
+[32m+[m[32mturn_right={[m
+[32m+[m[32m"deadzone": 0.5,[m
+[32m+[m[32m"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":68,"key_label":0,"unicode":100,"echo":false,"script":null)[m
+[32m+[m[32m][m
+[32m+[m[32m}[m
+[1mdiff --git a/scenes/main.tscn b/scenes/main.tscn[m
+[1mindex d930005..dce8fc8 100644[m
+[1m--- a/scenes/main.tscn[m
+[1m+++ b/scenes/main.tscn[m
+[36m@@ -8,7 +8,10 @@[m
+ [node name="world_light" type="Node3D" parent="."][m
+ [m
+ [node name="DirectionalLight3D" type="DirectionalLight3D" parent="world_light"][m
+[31m-transform = Transform3D(0.843382, 0.209781, -0.49467, 0, 0.920634, 0.390426, 0.537314, -0.329278, 0.776447, 1.38165, 3.47964, 3.2974)[m
+[32m+[m[32mtransform = Transform3D(-0.309017, 0.475528, -0.823639, 0, 0.866025, 0.5, 0.951056, 0.154509, -0.267617, 0, 10, 0)[m
+[32m+[m[32mtop_level = true[m
+[32m+[m[32mshadow_enabled = true[m
+[32m+[m[32mdirectional_shadow_blend_splits = true[m
+ sky_mode = 1[m
+ [m
+ [node name="dungeon" parent="." instance=ExtResource("1_n2dcx")][m
+[1mdiff --git a/scenes/test_enemy.tscn b/scenes/test_enemy.tscn[m
+[1mindex 227e128..5ca4c17 100644[m
+[1m--- a/scenes/test_enemy.tscn[m
+[1m+++ b/scenes/test_enemy.tscn[m
+[36m@@ -15,6 +15,8 @@[m
+ [m
+ [node name="state_machine" type="Node" parent="." node_paths=PackedStringArray("initial_state")][m
+ script = ExtResource("1_e8g4l")[m
+[32m+[m[32mmax_chase_distance = 50.0[m
+[32m+[m[32mrange_of_regard = 30.0[m
+ initial_state = NodePath("idle")[m
+ [m
+ [node name="idle" type="Node" parent="state_machine"][m
+[1mdiff --git a/scenes/third_person_character.tscn b/scenes/third_person_character.tscn[m
+[1mindex ef1173f..b35db0a 100644[m
+[1m--- a/scenes/third_person_character.tscn[m
+[1m+++ b/scenes/third_person_character.tscn[m
+[36m@@ -1,4 +1,4 @@[m
+[31m-[gd_scene load_steps=5 format=3 uid="uid://bkee16cpy3j8y"][m
+[32m+[m[32m[gd_scene load_steps=6 format=3 uid="uid://bkee16cpy3j8y"][m
+ [m
+ [ext_resource type="Script" path="res://src/player_controls/character_controller.gd" id="1_vvahs"][m
+ [ext_resource type="Script" path="res://src/player_controls/follow_camera.gd" id="2_5oxlu"][m
+[36m@@ -6,17 +6,22 @@[m
+ [m
+ [sub_resource type="BoxShape3D" id="BoxShape3D_cbbcf"][m
+ [m
+[31m-[node name="CharacterBody3D" type="CharacterBody3D"][m
+[31m-script = ExtResource("1_vvahs")[m
+[31m-speed = 23[m
+[32m+[m[32m[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ll2se"][m
+[32m+[m[32malbedo_color = Color(0.0300224, 0.596137, 0.698675, 1)[m
+ [m
+[31m-[node name="CSGBox3D" type="CSGBox3D" parent="."][m
+[32m+[m[32m[node name="CharacterBody3D" type="Node3D"][m
+ [m
+[31m-[node name="camera" type="Camera3D" parent="."][m
+[31m-script = ExtResource("2_5oxlu")[m
+[32m+[m[32m[node name="data" type="Node" parent="."][m
+[32m+[m[32mscript = ExtResource("3_xhcw4")[m
+[32m+[m
+[32m+[m[32m[node name="body_3d" type="CharacterBody3D" parent="."][m
+[32m+[m[32mscript = ExtResource("1_vvahs")[m
+ [m
+[31m-[node name="CollisionShape3D" type="CollisionShape3D" parent="."][m
+[32m+[m[32m[node name="collision_shape" type="CollisionShape3D" parent="body_3d"][m
+ shape = SubResource("BoxShape3D_cbbcf")[m
+ [m
+[31m-[node name="data" type="Node" parent="."][m
+[31m-script = ExtResource("3_xhcw4")[m
+[32m+[m[32m[node name="render_shape" type="CSGBox3D" parent="body_3d"][m
+[32m+[m[32mmaterial = SubResource("StandardMaterial3D_ll2se")[m
+[32m+[m
+[32m+[m[32m[node name="camera" type="Camera3D" parent="body_3d"][m
+[32m+[m[32mscript = ExtResource("2_5oxlu")[m
+[1mdiff --git a/src/player_controls/character_controller.gd b/src/player_controls/character_controller.gd[m
+[1mindex 661baf4..a7ca41d 100644[m
+[1m--- a/src/player_controls/character_controller.gd[m
+[1m+++ b/src/player_controls/character_controller.gd[m
+[36m@@ -2,6 +2,7 @@[m [mextends CharacterBody3D[m
+ [m
+ # How fast the player moves in meters per second.[m
+ @export var speed = 14[m
+[32m+[m[32m@export var turn_speed_rad = 3.14 / 20[m
+ # The downward acceleration when in the air, in meters per second squared.[m
+ @export var fall_acceleration = 75[m
+ [m
+[36m@@ -18,8 +19,8 @@[m [mfunc _physics_process(delta):[m
+ 	var direction = Vector3.ZERO[m
+ 	[m
+ 	var child_camera = get_node("camera")[m
+[31m-	var forward = child_camera.transform.basis.z[m
+[31m-	var right = child_camera.transform.basis.x[m
+[32m+[m	[32mvar forward: Vector3 = self.global_transform.basis.z[m
+[32m+[m	[32mvar right = self.global_transform.basis.x[m
+ 	[m
+ 	# We check for each move input and update the direction accordingly.[m
+ 	if Input.is_action_pressed("move_right"):[m
+[36m@@ -32,7 +33,7 @@[m [mfunc _physics_process(delta):[m
+ 		direction -= forward[m
+ 	[m
+ 	if Input.is_action_just_pressed("jump"):[m
+[31m-		target_velocity.y = 10[m
+[32m+[m		[32mtarget_velocity.y = 30[m
+ 		[m
+ 	# Ground Velocity[m
+ 	target_velocity.x = direction.x * speed[m
+[36m@@ -42,6 +43,30 @@[m [mfunc _physics_process(delta):[m
+ 	if not is_on_floor(): # If in the air, fall towards the floor. Literally gravity[m
+ 		target_velocity.y = target_velocity.y - (fall_acceleration * delta)[m
+ [m
+[31m-	# Moving the Character[m
+ 	velocity = target_velocity[m
+ 	move_and_slide()[m
+[32m+[m
+[32m+[m[32mfunc _input(event):[m
+[32m+[m[41m	[m
+[32m+[m	[32mvar mouse_right_clicked = Input.is_action_pressed("mouse_right_click")[m
+[32m+[m	[32mvar turn_left = Input.is_action_pressed("turn_left")[m
+[32m+[m	[32mvar turn_right = Input.is_action_pressed("turn_right")[m
+[32m+[m	[32mif mouse_right_clicked or turn_left or turn_right:[m
+[32m+[m		[32mif event is InputEventMouseMotion:[m
+[32m+[m			[32mvar child_camera = get_node("camera")[m
+[32m+[m			[32mvar mouse_sensitivity = child_camera.mouse_sensitivity[m
+[32m+[m			[32m# Get the mouse motion in the horizontal direction[m
+[32m+[m			[32mvar delta_x = -event.relative.x * mouse_sensitivity[m
+[32m+[m			[32mvar delta_y = -event.relative.y * mouse_sensitivity[m
+[32m+[m[41m			[m
+[32m+[m			[32m# Create a quaternion for the rotation around the Y-axis (up vector)[m
+[32m+[m			[32mvar rot_about_y = Quaternion(Vector3(0, 1, 0), delta_x)[m
+[32m+[m			[32mself.rotate_object_local(Vector3(0, 1, 0), delta_x)[m
+[32m+[m		[32melif turn_left or turn_right:[m
+[32m+[m			[32mvar delta_x = turn_speed_rad[m
+[32m+[m[41m			[m
+[32m+[m			[32m# Create a quaternion for the rotation around the Y-axis (up vector)[m
+[32m+[m			[32mvar sign = 1.0[m
+[32m+[m			[32mif turn_right:[m
+[32m+[m				[32msign *= -1[m
+[32m+[m			[32mself.rotate_object_local(Vector3(0, 1, 0), delta_x * sign)[m
+[1mdiff --git a/src/player_controls/follow_camera.gd b/src/player_controls/follow_camera.gd[m
+[1mindex 572a192..22b87ed 100644[m
+[1m--- a/src/player_controls/follow_camera.gd[m
+[1m+++ b/src/player_controls/follow_camera.gd[m
+[36m@@ -6,12 +6,34 @@[m [mextends Camera3D[m
+ [m
+ # Called when the node enters the scene tree for the first time.[m
+ func _ready():[m
+[31m-	transform = transform.translated(Vector3(10, 10, 10))[m
+[32m+[m	[32mtransform = transform.translated(Vector3(0, 10, 10))[m
+ 	transform = transform.looking_at(Vector3(0, 0, 0))[m
+ [m
+ # Called every frame. 'delta' is the elapsed time since the previous frame.[m
+ func _process(delta):[m
+[31m-	pass[m
+[32m+[m	[32mvar parent_body: CharacterBody3D = get_parent()[m
+[32m+[m	[32mif Input.is_action_pressed("move_forward"):[m
+[32m+[m		[32mvar left_mouse = Input.is_action_pressed("mouse_left_click")[m
+[32m+[m		[32mvar right_mouse = Input.is_action_pressed("mouse_right_click")[m
+[32m+[m[41m		[m
+[32m+[m		[32mif not (left_mouse or right_mouse):[m
+[32m+[m[41m			[m
+[32m+[m			[32mvar player_direction: Vector3 = parent_body.global_transform.basis.z.normalized()[m
+[32m+[m			[32mvar cam_forward: Vector3 = self.global_transform.basis.z[m
+[32m+[m[41m			[m
+[32m+[m			[32mvar cam_dir_proj: Vector3 = Vector3(cam_forward.x, 0.0, cam_forward.z)[m
+[32m+[m			[32mvar player_dir_proj: Vector3 = Vector3(player_direction.x, 0.0, player_direction.z)[m
+[32m+[m[41m			[m
+[32m+[m[41m			[m
+[32m+[m			[32mvar angle_between: float = cam_dir_proj.signed_angle_to(player_dir_proj, Vector3(0, 1, 0))[m
+[32m+[m[41m			[m
+[32m+[m			[32mvar rot_y = Quaternion(Vector3(0, 1, 0), angle_between * 0.05)[m
+[32m+[m			[32mvar pos_norm = transform.origin.normalized()[m
+[32m+[m			[32mvar rotated = rot_y * pos_norm[m
+[32m+[m			[32mvar rotated_and_scaled = rotated * transform.origin.length()[m
+[32m+[m			[32mvar offset = rotated_and_scaled - transform.origin[m
+[32m+[m			[32mtransform = transform.translated(offset)[m
+[32m+[m			[32mtransform = transform.looking_at(Vector3(0, 0, 0))[m
+ [m
+ func _input(event):[m
+ 	if Input.is_action_pressed("scroll_down"):[m
+[36m@@ -19,12 +41,15 @@[m [mfunc _input(event):[m
+ 	if Input.is_action_pressed("scroll_up"):[m
+ 		transform = transform.scaled(Vector3(0.9, 0.9, 0.9))		[m
+ 	[m
+[31m-	if Input.is_action_pressed("mouse_right_click"):[m
+[32m+[m	[32mif Input.is_action_pressed("mouse_left_click") or Input.is_action_pressed("mouse_right_click"):[m
+ 		if event is InputEventMouseMotion:[m
+ 			# Get the mouse motion in the horizontal direction[m
+ 			var delta_x = -event.relative.x * mouse_sensitivity[m
+ 			var delta_y = -event.relative.y * mouse_sensitivity[m
+ 			[m
+[32m+[m			[32mif not Input.is_action_pressed("mouse_left_click"):[m
+[32m+[m				[32mdelta_x = 0[m
+[32m+[m[41m			[m
+ 			# Create a quaternion for the rotation around the Y-axis (up vector)[m
+ 			var rot_about_y = Quaternion(Vector3(0, 1, 0), delta_x)[m
+ 			var rot_about_x = Quaternion(transform.basis.x, delta_y)[m
+[1mdiff --git a/src/state_machines/guard_state_machine.gd b/src/state_machines/guard_state_machine.gd[m
+[1mindex e3e083f..37c71a2 100644[m
+[1m--- a/src/state_machines/guard_state_machine.gd[m
+[1m+++ b/src/state_machines/guard_state_machine.gd[m
+[36m@@ -2,11 +2,11 @@[m
+ extends StateMachine[m
+ [m
+ [m
+[31m-var max_chase_distance: float = 10[m
+[31m-var range_of_regard: float = 15[m
+[31m-var attack_range: float = 5[m
+[32m+[m[32m@export var max_chase_distance: float = 10[m
+[32m+[m[32m@export var range_of_regard: float = 15[m
+[32m+[m[32m@export var attack_range: float = 5[m
+ [m
+[31m-var speed: float = 3[m
+[32m+[m[32m@export var speed: float = 3[m
+ var original_position: Vector3 = Vector3(0, 0, 0)[m
+ var target: CharacterBody3D = null[m
+ var agent_body: CharacterBody3D = null[m
+[1mdiff --git a/src/state_machines/idle_state.gd b/src/state_machines/idle_state.gd[m
+[1mindex 0bbbda7..9884cd5 100644[m
+[1m--- a/src/state_machines/idle_state.gd[m
+[1m+++ b/src/state_machines/idle_state.gd[m
+[36m@@ -13,7 +13,7 @@[m [mfunc process_state(delta):[m
+ 	var closest_character = get_closest_character()[m
+ 	if closest_character != null:[m
+ 		state_machine.change_state("chase")[m
+[31m-		state_machine.target = closest_character.get_parent()[m
+[32m+[m		[32mstate_machine.target = closest_character.get_parent().get_node("body_3d")[m
+ [m
+ func get_closest_character():[m
+ 	if not state_machine.is_inside_tree():[m
+[36m@@ -23,7 +23,7 @@[m [mfunc get_closest_character():[m
+ 	var characters = state_machine.get_tree().get_nodes_in_group("players")[m
+ 	for character in characters:[m
+ 		if character != self: # Avoid checking distance to itself[m
+[31m-			var distance = state_machine.get_parent().transform.origin.distance_to(character.get_parent().transform.origin)[m
+[32m+[m			[32mvar distance = state_machine.get_parent().global_transform.origin.distance_to(character.get_parent().get_node("body_3d").global_transform.origin)[m
+ 			if distance < min_distance and distance < state_machine.range_of_regard:[m
+ 				min_distance = distance[m
+ 				closest_character = character[m
+[1mdiff --git a/src/state_machines/move_to_range_state.gd b/src/state_machines/move_to_range_state.gd[m
+[1mindex 90b656f..8f6c7a0 100644[m
+[1m--- a/src/state_machines/move_to_range_state.gd[m
+[1m+++ b/src/state_machines/move_to_range_state.gd[m
+[36m@@ -8,6 +8,7 @@[m [mfunc enter():[m
+ [m
+ func process_state(delta):[m
+ 	if state_machine.target == null:[m
+[32m+[m		[32mpush_warning("Null Target")[m
+ 		state_machine.change_state("idle")[m
+ 		return [m
+ 	[m
+[36m@@ -23,8 +24,7 @@[m [mfunc process_state(delta):[m
+ 	[m
+ 	# check if we're  too far from the target now[m
+ 	if distance > state_machine.range_of_regard:[m
+[31m-		state_machine.change_state("idle")[m
+[31m-		state_machine.agent_body.set_velocity(Vector3(0, 0, 0))[m
+[32m+[m		[32mstate_machine.change_state("return_to_origin")[m
+ 		return[m
+ 	[m
+ 	# see if we're at attack range[m

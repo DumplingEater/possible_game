@@ -188,7 +188,7 @@ func _set_player_spawn():
 	var character = get_node("../../agents/players/character")
 	character.transform = character.transform.translated(char_spawn_point)
 	
-	var test_enemy = preload("res://scenes//test_enemy.tscn")
+	var test_enemy = preload("res://resources//scenes//test_enemy.tscn")
 	var instance =  test_enemy.instantiate()
 	instance.transform.origin = Vector3(char_spawn_point.x + 6, 5, char_spawn_point.z)
 	var mobs = get_node("../../agents/mobs")
