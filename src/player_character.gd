@@ -15,4 +15,3 @@ func _process(delta):
 	
 func apply_damage(damage: float):
 	health -= damage
-	print("Health is now ", health)

@@ -3,10 +3,10 @@ extends State
 class_name WaitForCooldown
 
 func enter():
-	print("Entering Wait For Cooldown")
+	pass
 	
 func exit():
-	print("Exiting Wait For Cooldown")
+	pass
 	
 func process_state(delta: float):
 	if state_machine.last_attack_time == null:
