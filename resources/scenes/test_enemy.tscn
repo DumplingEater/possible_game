@@ -19,7 +19,7 @@
 [node name="state_machine" type="Node" parent="." node_paths=PackedStringArray("initial_state")]
 script = ExtResource("1_lwt4h")
 max_chase_distance = 50.0
-range_of_regard = 30.0
+range_of_regard = 50.0
 attack_range = 15.0
 initial_state = NodePath("idle")
 

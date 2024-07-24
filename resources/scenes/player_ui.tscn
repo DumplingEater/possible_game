@@ -26,34 +26,3 @@ offset_top = 2.0
 offset_right = 257.0
 offset_bottom = 22.0
 show_percentage = false
-
-[node name="action_bar" type="HBoxContainer" parent="."]
-layout_mode = 2
-offset_left = 87.0
-offset_top = 574.0
-offset_right = 306.0
-offset_bottom = 604.0
-
-[node name="button_1" type="Button" parent="action_bar"]
-layout_mode = 2
-text = "spell 1"
-
-[node name="button_2" type="Button" parent="action_bar"]
-layout_mode = 2
-text = "spell 2"
-
-[node name="button_3" type="Button" parent="action_bar"]
-layout_mode = 2
-text = "spell 3"
-
-[node name="button_4" type="Button" parent="action_bar"]
-layout_mode = 2
-text = "spell 4"
-
-[node name="button_5" type="Button" parent="action_bar"]
-layout_mode = 2
-text = "spell 5"
-
-[node name="button_6" type="Button" parent="action_bar"]
-layout_mode = 2
-text = "spell 6"

@@ -9,7 +9,7 @@ var last_attack_time = null
 @export var cooldown = 1.5
 
 func enter():
-	print("Entering engage State")
+	print("Entering engage State") 
 	self.change_state("wait_for_cooldown")
 
 func process_state(delta):

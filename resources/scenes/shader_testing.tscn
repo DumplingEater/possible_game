@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://b3plbwmfj6u6m"]
+
+[ext_resource type="Shader" path="res://resources/shaders/shader_testing.gdshader" id="1_3g7p7"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wjmcv"]
+render_priority = 0
+shader = ExtResource("1_3g7p7")
+
+[sub_resource type="RibbonTrailMesh" id="RibbonTrailMesh_csvni"]
+material = SubResource("ShaderMaterial_wjmcv")
+shape = 0
+
+[node name="test" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(-1, 8.74228e-08, 0, -8.74228e-08, -1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("RibbonTrailMesh_csvni")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(4.37114e-08, -3.82137e-15, 1, -8.74228e-08, -1, 0, 1, -8.74228e-08, -4.37114e-08, 0, 0.5, 0)
+mesh = SubResource("RibbonTrailMesh_csvni")

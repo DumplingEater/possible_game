@@ -35,6 +35,7 @@ shape = SubResource("BoxShape3D_cbbcf")
 material = SubResource("StandardMaterial3D_ll2se")
 
 [node name="camera" type="Camera3D" parent="body_3d"]
+current = true
 script = ExtResource("2_5oxlu")
 
 [node name="ui" parent="." instance=ExtResource("4_q4vam")]
