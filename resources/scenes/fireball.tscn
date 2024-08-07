@@ -1,23 +1,59 @@
-[gd_scene load_steps=7 format=3 uid="uid://bablflwgqpj8o"]
+[gd_scene load_steps=13 format=3 uid="uid://bablflwgqpj8o"]
 
-[ext_resource type="Shader" path="res://resources/shaders/fireball.gdshader" id="1_24h4f"]
 [ext_resource type="Script" path="res://src/spell_projectile_data.gd" id="1_emk6e"]
 [ext_resource type="Script" path="res://src/spell_projectile_motion.gd" id="1_jbg6e"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_mty2v"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_1llo4"]
-render_priority = 0
-shader = ExtResource("1_24h4f")
-shader_parameter/emission_intensity = 2.0
-shader_parameter/time_scale = 3.0
-shader_parameter/texture_scale = Vector2(1, 1)
-shader_parameter/edge_softness = 0.1
+[sub_resource type="BoxMesh" id="BoxMesh_sdg5e"]
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_cs7fl"]
-material = SubResource("ShaderMaterial_1llo4")
-radius = 0.25
-height = 0.5
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b5prc"]
+transparency = 1
+blend_mode = 1
+albedo_color = Color(0.698039, 0.407843, 0.27451, 0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_17pl8"]
+transparency = 1
+vertex_color_use_as_albedo = true
+albedo_color = Color(1, 0.468707, 0.31838, 1)
+emission_enabled = true
+emission = Color(1, 0.39036, 0.297624, 1)
+emission_energy_multiplier = 1.65
+backlight_enabled = true
+proximity_fade_enabled = true
+
+[sub_resource type="Curve" id="Curve_4ydp8"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.228013, 0.279661), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_whw14"]
+curve = SubResource("Curve_4ydp8")
+
+[sub_resource type="Curve" id="Curve_yvjfs"]
+_data = [Vector2(0, 0.508475), 0.0, 0.0, 0, 0, Vector2(0.986971, 1), 0.498014, 0.0, 1, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_i44n1"]
+curve = SubResource("Curve_yvjfs")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_wjscx"]
+angle_min = -45.0
+angle_max = 45.0
+direction = Vector3(0, 0, -1)
+spread = 5.12
+initial_velocity_min = 5.0
+initial_velocity_max = 9.0
+gravity = Vector3(0, 3, 0)
+scale_curve = SubResource("CurveTexture_i44n1")
+alpha_curve = SubResource("CurveTexture_whw14")
+turbulence_enabled = true
+turbulence_noise_strength = 0.1
+turbulence_noise_scale = 0.618
+turbulence_noise_speed_random = 0.11
+turbulence_influence_min = 0.01
+turbulence_influence_max = 0.05
+
+[sub_resource type="SphereMesh" id="SphereMesh_jg28j"]
 
 [node name="Fireball" type="Node3D"]
 script = ExtResource("1_emk6e")
@@ -30,9 +66,19 @@ script = ExtResource("1_jbg6e")
 shape = SubResource("SphereShape3D_mty2v")
 
 [node name="mesh" type="MeshInstance3D" parent="Area3D"]
-mesh = SubResource("CapsuleMesh_cs7fl")
+mesh = SubResource("BoxMesh_sdg5e")
 skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_b5prc")
 
 [node name="light_emitter" type="OmniLight3D" parent="Area3D"]
 light_color = Color(0.962611, 0.202223, 0, 1)
 light_energy = 0.553
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="Area3D"]
+material_override = SubResource("StandardMaterial3D_17pl8")
+amount = 1024
+lifetime = 3.0
+interpolate = false
+fract_delta = false
+process_material = SubResource("ParticleProcessMaterial_wjscx")
+draw_pass_1 = SubResource("SphereMesh_jg28j")
