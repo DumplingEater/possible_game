@@ -14,5 +14,5 @@ func enter():
 func exit():
 	pass
 
-func process_state(delta):
-	pass
+#func process_state(delta):
+	#pass

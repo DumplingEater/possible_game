@@ -1,7 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://cx6470uohatbh"]
+[gd_scene load_steps=4 format=3 uid="uid://cx6470uohatbh"]
 
 [ext_resource type="PackedScene" uid="uid://b5jpr0o1187hx" path="res://resources/scenes/dungeon_level.tscn" id="1_n2dcx"]
 [ext_resource type="PackedScene" uid="uid://bkee16cpy3j8y" path="res://resources/scenes/third_person_character.tscn" id="2_8juhv"]
+
+[sub_resource type="PrismMesh" id="PrismMesh_qpu2j"]
 
 [node name="main" type="Node3D"]
 
@@ -23,3 +25,32 @@ sky_mode = 1
 [node name="players" type="Node" parent="agents"]
 
 [node name="character" parent="agents/players" instance=ExtResource("2_8juhv")]
+
+[node name="x" type="Node3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="x"]
+transform = Transform3D(10, 0, 0, 0, 74.5755, 6.6622, 0, -66.622, 7.45755, 500, 0, 0)
+mesh = SubResource("PrismMesh_qpu2j")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="x"]
+transform = Transform3D(10, 0, 0, 0, 67.7377, -7.35636, 0, 73.5636, 6.77377, 500, 0, -6.62765)
+mesh = SubResource("PrismMesh_qpu2j")
+skeleton = NodePath("../..")
+
+[node name="Node3D" type="Node3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D"]
+transform = Transform3D(0.200463, 99.8504, -0.508678, -0.202545, 5.12733, 9.98479, 9.99594, -1.89855, 0.212521, 0, 35.2528, 500)
+mesh = SubResource("PrismMesh_qpu2j")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Node3D"]
+transform = Transform3D(0.284974, -73.5337, -6.77102, 0, 67.7377, -7.35636, 9.99594, 2.09637, 0.193035, 0, 0, 500)
+mesh = SubResource("PrismMesh_qpu2j")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="Node3D"]
+transform = Transform3D(0.200463, 99.8504, -0.508678, -0.202545, 5.12733, 9.98479, 9.99594, -1.89855, 0.212521, 0, -32.8357, 500)
+mesh = SubResource("PrismMesh_qpu2j")
+skeleton = NodePath("../..")

@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://cofyrhg48uvpp"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nj83p"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_dgtbu"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pwl5g"]
+
+[node name="floor" type="StaticBody3D"]
+
+[node name="collider" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_nj83p")
+
+[node name="mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_dgtbu")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_pwl5g")

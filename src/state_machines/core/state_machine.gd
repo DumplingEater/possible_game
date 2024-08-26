@@ -26,7 +26,6 @@ func change_state(new_state_name: String):
 func get_states_from_children():
 	for child in get_children():
 		if child.has_method("get_script"):
-			var script = child.get_script()
 			states[child.name] = child
 	
 	# Print to verify

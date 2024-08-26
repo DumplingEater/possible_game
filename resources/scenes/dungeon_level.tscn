@@ -1,8 +1,12 @@
-[gd_scene load_steps=2 format=3 uid="uid://b5jpr0o1187hx"]
+[gd_scene load_steps=3 format=3 uid="uid://b5jpr0o1187hx"]
 
 [ext_resource type="Script" path="res://src/procedural_generation/dungeon_generator.gd" id="1_14uwh"]
+[ext_resource type="PackedScene" uid="uid://dthld4x4fgs6x" path="res://resources/scenes/base_room.tscn" id="2_6wpme"]
 
 [node name="dungeon" type="Node3D"]
 
 [node name="dungeon_spawner" type="Node3D" parent="."]
 script = ExtResource("1_14uwh")
+min_room_size = 30
+room_count = 30
+base_room = ExtResource("2_6wpme")

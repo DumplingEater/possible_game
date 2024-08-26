@@ -13,8 +13,12 @@ func _physics_process(delta):
 	self.global_transform = self.global_transform.translated(dir * delta * get_parent().speed)
 	
 func _on_Area3D_body_entered(body):
-	if body.is_in_group("players"):
+	if body == get_parent().target:
 		var data_node = body.get_parent().get_node("data")
-		data_node.apply_damage(get_parent().damage)
-		# Handle the collision (e.g., apply damage, destroy the projectile, etc.)
+		if data_node:
+			data_node.apply_damage(get_parent().damage)
+			# Handle the collision (e.g., apply damage, destroy the projectile, etc.)
+		else:
+			push_error("Spell hit node with no data node or whatever idk. this thing doesn't have a script to take damage")
 		get_parent().queue_free()  # Example: Remove the projectile
+		

@@ -1,10 +1,10 @@
 [gd_scene load_steps=10 format=3 uid="uid://bkee16cpy3j8y"]
 
+[ext_resource type="Script" path="res://src/agent_data.gd" id="1_jv2i5"]
 [ext_resource type="Script" path="res://src/player_controls/player_motion_controller.gd" id="1_vvahs"]
 [ext_resource type="Script" path="res://src/player_controls/follow_camera.gd" id="2_5oxlu"]
 [ext_resource type="Script" path="res://src/spellbook.gd" id="2_h3wa7"]
 [ext_resource type="PackedScene" uid="uid://bablflwgqpj8o" path="res://resources/scenes/fireball.tscn" id="3_mvmjn"]
-[ext_resource type="Script" path="res://src/player_character.gd" id="3_xhcw4"]
 [ext_resource type="Script" path="res://src/player_controls/player_combat_controller.gd" id="4_10ram"]
 [ext_resource type="PackedScene" uid="uid://bj2fkhwbgremr" path="res://resources/scenes/player_ui.tscn" id="4_q4vam"]
 
@@ -16,7 +16,7 @@ albedo_color = Color(0.0300224, 0.596137, 0.698675, 1)
 [node name="character" type="Node3D"]
 
 [node name="data" type="Node" parent="."]
-script = ExtResource("3_xhcw4")
+script = ExtResource("1_jv2i5")
 
 [node name="spellbook" type="Node" parent="data"]
 script = ExtResource("2_h3wa7")

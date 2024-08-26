@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://sg6ymqcxjcct"]
+[gd_scene load_steps=13 format=3 uid="uid://sg6ymqcxjcct"]
 
 [ext_resource type="Script" path="res://src/state_machines/guard_state_machine.gd" id="1_lwt4h"]
 [ext_resource type="Script" path="res://src/state_machines/idle_state.gd" id="2_pqw01"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://src/state_machines/wait_for_cooldown.gd" id="6_l1h54"]
 [ext_resource type="Script" path="res://src/state_machines/return_to_origin.gd" id="7_m4sxp"]
 [ext_resource type="Script" path="res://src/mob_rigidbody.gd" id="8_o4dw7"]
+[ext_resource type="Script" path="res://src/agent_data.gd" id="10_p1ca8"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_hnul1"]
 
@@ -19,7 +20,7 @@
 [node name="state_machine" type="Node" parent="." node_paths=PackedStringArray("initial_state")]
 script = ExtResource("1_lwt4h")
 max_chase_distance = 50.0
-range_of_regard = 50.0
+range_of_regard = 30.0
 attack_range = 15.0
 initial_state = NodePath("idle")
 
@@ -51,3 +52,6 @@ shape = SubResource("CylinderShape3D_hnul1")
 [node name="mesh_3d" type="MeshInstance3D" parent="body_3d"]
 mesh = SubResource("CylinderMesh_btp1y")
 skeleton = NodePath("../..")
+
+[node name="data" type="Node" parent="."]
+script = ExtResource("10_p1ca8")

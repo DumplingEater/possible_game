@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://dthld4x4fgs6x"]
+
+[ext_resource type="Script" path="res://src/procedural_generation/room_generator.gd" id="1_rc1xh"]
+[ext_resource type="PackedScene" uid="uid://cofyrhg48uvpp" path="res://resources/scenes/room_piece_cube.tscn" id="2_kqbpy"]
+
+[node name="base_room" type="Node3D"]
+script = ExtResource("1_rc1xh")
+building_block = ExtResource("2_kqbpy")

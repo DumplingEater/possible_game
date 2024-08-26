@@ -8,68 +8,40 @@ extends Node3D
 @export var max_iterations: int = 100000
 @export var hall_width: float = 5
 
+@export var base_room: PackedScene = null
+
 var char_spawn_point: Vector3 = Vector3.ZERO
 
-class RoomNode:
-	var x: int = 0
-	var z: int = 0
-	var half_width: int = 5
-	var half_depth: int = 5
-	
-	func _init(x: int, z: int, w: int, d: int):
-		self.x = x
-		self.z = z
-		self.half_width = w
-		self.half_depth = d
-		
-	func min_x() -> int:
-		return self.x - self.half_width
-	
-	func max_x() -> int:
-		return self.x + self.half_width
-		
-	func min_z() -> int:
-		return self.z - self.half_depth
-		
-	func max_z() -> int:
-		return self.z + self.half_depth
-	
-	func overlaps_room(other: RoomNode) -> bool:
-		if other.max_x() < self.min_x():
-			return false
-		if other.min_x() > self.max_x():
-			return false
-		if other.max_z() < self.min_z():
-			return false
-		if other.min_z() > self.max_z():
-			return false
-		return true
-		
-	func in_plane_distance_from_room(other: RoomNode) -> float:
-		var xdiff = self.x - other.x
-		var zdiff = self.z - other.z
-		return sqrt(xdiff * xdiff + zdiff * zdiff)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	char_spawn_point = Vector3.ZERO
 	var spawn_set = false
 	
+	print("Building rooms...")
 	var rng = RandomNumberGenerator.new()
 	var rooms = []
 	var iterations = 0
 	while len(rooms) < room_count:
 		var x: int = rng.randi_range(-grid_size, grid_size)
 		var z: int = rng.randi_range(-grid_size, grid_size)
-		var dx: int = rng.randi_range(min_room_size, max_room_size)
-		var dz: int = rng.randi_range(min_room_size, max_room_size)
+		var dx: float = rng.randi_range(min_room_size, max_room_size)
+		var dz: float = rng.randi_range(min_room_size, max_room_size)
 		
-		var candidate_room: RoomNode = RoomNode.new(x, z, dx, dz)
+		var candidate_room = base_room.instantiate()
+		var room_position: Vector3 = Vector3(x, 0.0, z)
+		var room_size: Vector3 = Vector3(dx, 1.0, dz)
+		add_child(candidate_room)
+		candidate_room.construct_room(room_position, room_size)
+		
+		# see if this room overlaps an existing room, and if so, free it
 		var room_overlaps: bool = false
 		for room in rooms:
 			if room.overlaps_room(candidate_room):
 				room_overlaps = true
+				candidate_room.free()
 				break
+				
 		if not room_overlaps:
 			rooms.append(candidate_room)
 		
@@ -77,6 +49,7 @@ func _ready():
 		if iterations >= max_iterations:
 			break
 	
+	print("Building MST graph...")
 	var room_graph = {}
 	var rooms_added_to_graph = []
 	
@@ -91,10 +64,10 @@ func _ready():
 		
 		# iterate each node in the graph and each room in rooms and find the closest pair
 		# then add that pair and keep looping. i think this is prim's algorithm idk
-		for graph_node: RoomNode in room_graph:
+		for graph_node in room_graph:
 			
 			# compare this graph node to every candidate
-			for candidate_node: RoomNode in rooms:
+			for candidate_node in rooms:
 			
 				# don't check nodes already in graph
 				if candidate_node in rooms_added_to_graph:
@@ -115,15 +88,21 @@ func _ready():
 		# track of it as a directed graph so it's easier to know which edges i've added
 		room_graph[best_graph_node].append(best_candidate_node)
 	
+	print("Building halls from MST Graph...\n\n")
 	# i guess for conceptual sake i am picturing this top down +x to right +z 'up'
 	for room in room_graph:
 		var adjacent_rooms = room_graph[room]
 		for target_room in adjacent_rooms:
-			var x_overlap = !(room.max_x() < target_room.min_x() or room.min_x() > target_room.max_x())
-			var z_overlap = !(room.max_z() < target_room.min_z() or room.min_z() > target_room.max_z())
+
+			var rooms_overlap_on_x_axis = !(room.max_x() < target_room.min_x() or room.min_x() > target_room.max_x())
+			var rooms_overlap_on_z_axis = !(room.max_z() < target_room.min_z() or room.min_z() > target_room.max_z())
 			
-			# if there's overlap we can just do a straight hall so check that first
-			if x_overlap or z_overlap:
+			var x_overlap_amount = abs(room.max_x() - target_room.min_x()) if rooms_overlap_on_x_axis else 0.0
+			var z_overlap_amount = abs(room.max_z() - target_room.min_z()) if rooms_overlap_on_z_axis else 0.0
+			
+			# if the rooms overlap enough to fit a hall just do a straight hall
+			#region Straight Halls
+			if x_overlap_amount > hall_width + 2 or z_overlap_amount > hall_width + 2:
 				
 				# just line up our 4 x values and sort and our x bounds for hall
 				# pos are the middle two. same for z actually for the bounds of
@@ -137,49 +116,127 @@ func _ready():
 				var hall_x = (x_edges[1] + x_edges[2]) / 2
 				var hall_z = (z_edges[1] + z_edges[2]) / 2
 				
-				var mesh_instance = MeshInstance3D.new()
-				var mesh = BoxMesh.new()
-				#mesh.size = Vector3(room.half_width, 1, room.half_depth)
-				if x_overlap:
-					var hall_length = abs(z_edges[1] - z_edges[2]) + 1
-					mesh.size = Vector3(hall_width, 1, hall_length)
-				elif z_overlap:
-					var hall_length = abs(x_edges[1] - x_edges[2]) + 1
-					mesh.size = Vector3(hall_length, 1, hall_width)
-				mesh_instance.mesh = mesh
-				mesh_instance.position = Vector3(hall_x, 0.0, hall_z)
-				mesh_instance.create_convex_collision()
-				add_child(mesh_instance)
+				# calculate position and size of hall
+				var hall_size: Vector3 = Vector3(0, 0, 0)
+				if rooms_overlap_on_x_axis:
+					var hall_length = abs(z_edges[1] - z_edges[2])
+					hall_size = Vector3(hall_width, 1.0, hall_length)
+				elif rooms_overlap_on_z_axis:
+					var hall_length = abs(x_edges[1] - x_edges[2])
+					hall_size = Vector3(hall_length, 1.0, hall_width)
 				
+				var hall_position = Vector3(hall_x, 0.0, hall_z)	
+				var hall_room = base_room.instantiate()
+				add_child(hall_room)
+				hall_room.construct_room(hall_position, hall_size)
 				continue
+#endregion
 			
-			var x_diff = abs(room.x - target_room.x)
-			var z_diff = abs(room.z - target_room.z)
 			
-			# if x_diff is less, they're probably vertically stacked
-			if x_diff < z_diff:
-				pass
-			else:  # probably horizontally lined up
-				pass
+			# the cases where rooms don't directly overlap correlate
+			# to the target room being off of one of the four corners of this
+			# room, so we need a bent hall
+			
+			var x_diff = abs(room.global_position.x - target_room.global_position.x)
+			var z_diff = abs(room.global_position.z - target_room.global_position.z)
+			
+			# gets closest corner
+			var start_x = min(room.max_x(), target_room.global_position.x)
+			start_x = max(room.min_x(), start_x)
+			var start_z = min(room.max_z(), target_room.global_position.z)
+			start_z = max(room.min_z(), start_z)
+			
+			var should_go_right = bool(target_room.global_position.x > room.global_position.x)
+			var should_go_up = bool(target_room.global_position.z > room.global_position.z)
+			
+			var first_leg_start_position = Vector3()
+			var first_leg_end_position = Vector3()
+			var second_leg_start_position = Vector3()
+			var second_leg_end_position = Vector3()
+			var first_leg_scale = Vector3()
+			var second_leg_scale = Vector3()
+			var first_leg_along_z = false
+			var second_leg_along_z = false
+			if randf_range(0.0, 1.0) < 0.5:
+				# moving in z first, snap x to center
+				first_leg_along_z = true
+				var target_z = target_room.global_position.z
+				start_x = room.global_position.x
+				
+				if should_go_up:
+					first_leg_end_position = Vector3(start_x, 0.0, target_z - hall_width / 2.0)
+				else:
+					first_leg_end_position = Vector3(start_x, 0.0, target_z + hall_width / 2.0)
+				
+				first_leg_start_position = Vector3(start_x, 0.0, start_z)
+				first_leg_scale = Vector3(hall_width, 1.0, abs(first_leg_end_position.z - start_z))
+					
+				var target_x = 0.0
+				if should_go_right:
+					target_x = target_room.min_x()
+					second_leg_start_position = Vector3(start_x + hall_width / 2.0, 0.0, target_z)
+				else:
+					target_x = target_room.max_x()
+					second_leg_start_position = Vector3(start_x - hall_width / 2.0, 0.0, target_z)
+				
+				second_leg_end_position = Vector3(target_x, 0.0, target_z)
+				second_leg_scale = Vector3(abs(second_leg_end_position.x - second_leg_start_position.x), 1.0, hall_width)
+			else:  # going horizontal first
+				second_leg_along_z = true
+				var target_x = target_room.global_position.x
+				start_z = room.global_position.z
+				
+				if should_go_right:
+					first_leg_end_position = Vector3(target_x - hall_width / 2.0, 0.0, start_z)
+				else:
+					first_leg_end_position = Vector3(target_x + hall_width / 2.0, 0.0, start_z)
+				
+				first_leg_start_position = Vector3(start_x, 0.0, start_z)
+				first_leg_scale = Vector3(abs(first_leg_end_position.x - first_leg_start_position.x), 1.0, hall_width)
+				
+				var target_z = 0.0	
+				if should_go_up:
+					target_z = target_room.min_z()
+					second_leg_start_position = Vector3(target_x, 0.0, start_z + hall_width / 2.0)
+				else:
+					target_z = target_room.max_z()
+					second_leg_start_position = Vector3(target_x, 0.0, start_z - hall_width / 2.0)
+				
+				second_leg_end_position = Vector3(target_x, 0.0, target_z)
+				second_leg_scale = Vector3(hall_width, 1.0, abs(second_leg_end_position.z - second_leg_start_position.z))	
+			
+			var first_hall_leg = base_room.instantiate()
+			add_child(first_hall_leg)
+			var first_leg_center = (first_leg_start_position + first_leg_end_position) / 2.0
+			first_hall_leg.height = 1.0
+			first_hall_leg.construct_room(
+				first_leg_center,
+				first_leg_scale,
+				first_leg_along_z,
+				not first_leg_along_z
+			)
+			
+			var second_hall_leg = base_room.instantiate()
+			add_child(second_hall_leg)
+			var second_leg_center = (second_leg_start_position + second_leg_end_position) / 2.0
+			second_hall_leg.construct_room(
+				second_leg_center,
+				second_leg_scale,
+				second_leg_along_z,
+				not second_leg_along_z
+			)
+			
+			#var starting_point: Vector3(start_x, 0.0, start_z)
+			#var elbow_point = Vector3
 	
+	print("Setting spawn point...")
+	# add rooms as children
 	for room in rooms:
-		var mesh_instance = MeshInstance3D.new()
-		var mesh = BoxMesh.new()
-
-		# Set the size of the cube based on the room dimensions
-		mesh.size = Vector3(room.half_width * 2, 1, room.half_depth * 2)
-		mesh_instance.mesh = mesh
-
-		# Set the position of the cube
-		mesh_instance.position = Vector3(room.x, 0.0, room.z)
-		mesh_instance.create_convex_collision()
-		
 		if not spawn_set:
-			char_spawn_point = mesh_instance.position + Vector3(0, 5, 0)
+			char_spawn_point = room.global_position + Vector3(0, 5, 0)
 			spawn_set = true
-		
 		# Add the cube to the scene
-		add_child(mesh_instance)
+		#add_child(room)
 	
 	var character = get_node("../../agents/players/character")
 	character.ready.connect(_set_player_spawn)

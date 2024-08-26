@@ -12,18 +12,20 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	var parent_body: CharacterBody3D = get_parent()
-	if Input.is_action_pressed("move_forward"):
+	var should_rotate_camera = false
+	if Input.is_action_pressed("move_forward") or Input.is_action_pressed("move_back"):
 		var left_mouse = Input.is_action_pressed("mouse_left_click")
 		var right_mouse = Input.is_action_pressed("mouse_right_click")
 		
 		if not (left_mouse or right_mouse):
-			
+			should_rotate_camera = true
+	
+	if should_rotate_camera:
 			var player_direction: Vector3 = parent_body.global_transform.basis.z.normalized()
 			var cam_forward: Vector3 = self.global_transform.basis.z
 			
 			var cam_dir_proj: Vector3 = Vector3(cam_forward.x, 0.0, cam_forward.z)
 			var player_dir_proj: Vector3 = Vector3(player_direction.x, 0.0, player_direction.z)
-			
 			
 			var angle_between: float = cam_dir_proj.signed_angle_to(player_dir_proj, Vector3(0, 1, 0))
 			

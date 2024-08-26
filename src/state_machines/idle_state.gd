@@ -3,9 +3,11 @@ extends State
 
 class_name IdleState
 
+var players = null
 
 func enter():
 	print("Entering Idle State")
+	players = state_machine.get_tree().get_nodes_in_group("players")
 
 func process_state(delta):
 	
@@ -20,8 +22,7 @@ func get_closest_character():
 		return null
 	var min_distance = INF
 	var closest_character = null
-	var characters = state_machine.get_tree().get_nodes_in_group("players")
-	for character in characters:
+	for character in players:
 		if character != self: # Avoid checking distance to itself
 			var distance = state_machine.get_parent().global_transform.origin.distance_to(character.get_parent().get_node("body_3d").global_transform.origin)
 			if distance < min_distance and distance < state_machine.range_of_regard:
