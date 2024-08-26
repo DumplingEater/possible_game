@@ -78,8 +78,9 @@ light_color = Color(0.962611, 0.202223, 0, 1)
 light_energy = 0.553
 
 [node name="mesh" type="MeshInstance3D" parent="Area3D"]
-mesh = SubResource("CapsuleMesh_cs7fl")
+mesh = SubResource("BoxMesh_sdg5e")
 skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_b5prc")
 
 [node name="particle_testing" type="GPUParticles3D" parent="Area3D"]
 amount = 400

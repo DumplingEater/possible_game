@@ -4,102 +4,79 @@
 shader_type spatial;
 render_mode blend_mix;
 
-// This texture must be seamless!
-// Experiment with the different noises provided in the res://Demos/StylizedFire/ folder
-uniform sampler2D noise_texture;
+//////////////////////
+// Fire Flame shader
 
-uniform sampler2D texture_mask;
-uniform float emission_intensity = 2.0;
-uniform float time_scale = 3.0;
-uniform vec2 texture_scale = vec2(1.0);
-uniform float edge_softness = 0.1;
-
-// ANCHOR: varying
-varying vec3 world_coord;
-varying float world_x_dot;
-// END: varying
-
-void vertex() {
-	// ANCHOR: matworld_1
-	// Billboard code, taken directly from a spatial material
-	// create a spatial material, enable billboard with billboard keep scale, and then convert
-	// to shader material, and it will create a shader with this code.
-	mat4 mat_world = mat4(
-			normalize(INV_VIEW_MATRIX[0]) * length(MODEL_MATRIX[0]),
-			normalize(INV_VIEW_MATRIX[1]) * length(MODEL_MATRIX[0]),
-			normalize(INV_VIEW_MATRIX[2]) * length(MODEL_MATRIX[2]),
-			MODEL_MATRIX[3]);
-	// END: matworld_1
-	// ANCHOR: matworld_2
-	mat_world *= mat4(
-			vec4(cos(INSTANCE_CUSTOM.x), -sin(INSTANCE_CUSTOM.x), 0.0, 0.0), 
-			vec4(sin(INSTANCE_CUSTOM.x), cos(INSTANCE_CUSTOM.x), 0.0, 0.0),
-			vec4(0.0, 0.0, 1.0, 0.0),
-			vec4(0.0, 0.0, 0.0, 1.0));
-	// END: matworld_2
-	// ANCHOR: modelview
-	MODELVIEW_MATRIX = VIEW_MATRIX * mat_world;
-	// END: modelview
-	// ANCHOR: varying_calculations
-	// We map the coordinates on the vertical planes xy and zy
-	// we also calculate how to blend between the two based on where the world space normal
-	// is pointing.
-	world_coord = (mat_world * vec4(VERTEX, 1.0)).xyz;
-	vec4 world_normal = (mat_world * vec4(NORMAL, 0.0));
-	world_x_dot =  abs(dot(normalize(world_normal.xyz), vec3(1.0, 0.0, 0.0)));
-	// END: varying_calculations
+// procedural noise from IQ
+vec2 hash( vec2 p )
+{
+	p = vec2( dot(p,vec2(127.1,311.7)),
+			 dot(p,vec2(269.5,183.3)) );
+	return -1.0 + 2.0*fract(sin(p)*43758.5453123);
 }
 
-void fragment() {
-	// ANCHOR: mask
-	// We sample the mask texture based on regular UV
-	// We don't want the particles to show their square shape
-	// so we use a round, black and white, mask texture
-	float mask = texture(texture_mask, UV).r;
-	// END: mask
-	// ANCHOR: pan
-	vec2 time_based_pan = vec2(0.2, 1.0) * (-TIME * time_scale);
-	// END: pan
-	// ANCHOR: noise_planes
-	// We sample the noise both from the xy plane and from the zy plane, adding a time-based
-	// panning. If we didn't do this, we would see the holes of the noise will always be in the
-	// same space in global coordinates. Set the time_scale to zero to see how it would look like.
-	// To add more variation, we could sample from another noise that has a different scale and panning speed.
-	// The additional offset on the zy noise is to avoid mirroring effects when
-	// the view vector is between same-sign x and z axes
-	float noise_xy = texture(noise_texture, world_coord.xy * texture_scale + time_based_pan).r;
-	float noise_zy = texture(noise_texture, 
-			world_coord.zy * texture_scale + time_based_pan + vec2(0.7, 0.3)).r;
-	// END: noise_planes
-	// ANCHOR: noise_mix
-	// We blend the noise based on world_x_dot, which is the dot product between
-	// the normal of the billboard plane, and the global x axis. If we face the global
-	// x axis, then we sample from the xy plane, otherwise, we sample from the zy plane
-	float noise = mix(noise_xy, noise_zy, clamp(world_x_dot, 0.0, 1.0));
-	// END: noise_mix
-	// The particle color is assigned to the vertex color, which is called COLOR
-	ALBEDO = COLOR.rgb;
-	// ANCHOR: emission
-	// Assign the same color for emission, multiplied by the emission intensity
-	EMISSION = ALBEDO * emission_intensity;
-	// END: emission
-	// ANCHOR: alpha_erosion
-	// Instead of blending out the particle, we apply a technique called alpha erosion, where we
-	// subtract an erosion amount from the alpha.
-	float alpha = noise * mask;
-	alpha += COLOR.a - 1.0;
-	// END: alpha_erosion
-	// ANCHOR: alpha_clamp
-	// Because we perform a subtraction, we ensure that the alpha is always between 0 and 1.
-	// If the alpha goes negative or above 1, a number of visual artifacts appear.
-	alpha = clamp(alpha, 0.0, 1.0);
-	// END: alpha_clamp
-	// ANCHOR: smoothstep
-	// In order to give this fire a stylized vibe, we use smoothstep to remap the alpha value
-	// We could use step(0.1, alpha), but then there would be an abrupt cut between transparent and
-	// non transparent (exactly as if we discarded the fragment with discard)
-	// smoothstep gives a nice blend on the edges instead
-	ALPHA = smoothstep(0.0, edge_softness, alpha);
-	// END: smoothstep
+float noise( in vec2 p )
+{
+	const float K1 = 0.366025404; // (sqrt(3)-1)/2;
+	const float K2 = 0.211324865; // (3-sqrt(3))/6;
+	
+	vec2 i = floor( p + (p.x+p.y)*K1 );
+	
+	vec2 a = p - i + (i.x+i.y)*K2;
+	vec2 o = (a.x>a.y) ? vec2(1.0,0.0) : vec2(0.0,1.0);
+	vec2 b = a - o + K2;
+	vec2 c = a - 1.0 + 2.0*K2;
+	
+	vec3 h = max( 0.5-vec3(dot(a,a), dot(b,b), dot(c,c) ), 0.0 );
+	
+	vec3 n = h*h*h*h*vec3( dot(a,hash(i+0.0)), dot(b,hash(i+o)), dot(c,hash(i+1.0)));
+	
+	return dot( n, vec3(70.0) );
 }
-// END: all
+
+float fbm(vec2 uv)
+{
+	float f;
+	mat2 m = mat2(vec2(1.6,  1.2), vec2(-1.2,  1.6));
+	f  = 0.5000*noise( uv ); uv = m*uv;
+	f += 0.2500*noise( uv ); uv = m*uv;
+	f += 0.1250*noise( uv ); uv = m*uv;
+	f += 0.0625*noise( uv ); uv = m*uv;
+	f = 0.5 + 0.5*f;
+	return f;
+}
+
+// no defines, standard redish flames
+//#define BLUE_FLAME
+//#define GREEN_FLAME
+
+void fragment()
+{
+	vec2 uv = vec2(UV.x, UV.y);
+	vec2 q = uv;
+	q.x *= 5.;
+	q.y *= 2.;
+	float strength = floor(q.x+1.);
+	float T3 = max(3.,1.25*strength)*TIME;
+	q.x = mod(q.x,1.)-0.5;
+	q.y -= 0.25;
+	float n = fbm(strength*q - vec2(0,T3));
+	float c = 1. - 16. * pow( max( 0., length(q*vec2(1.8+q.y*1.5,.75) ) - n * max( 0., q.y+.25 ) ),1.2 );
+//	float c1 = n * c * (1.5-pow(1.25*uv.y,4.));
+	float c1 = n * c * (1.5-pow(2.50*uv.y,4.));
+	c1=clamp(c1,0.,1.);
+
+	vec3 col = vec3(1.5*c1, 1.5*c1*c1*c1, c1*c1*c1*c1*c1*c1);
+	
+//#ifdef BLUE_FLAME
+	//col = col.zyx;
+//#endif
+//#ifdef GREEN_FLAME
+	//col = 0.85*col.yxz;
+//#endif
+	
+	float a = c * (1.-pow(uv.y,3.));
+	ALBEDO = vec3( mix(vec3(0.),col,a));
+	//ALPHA = length(a);
+	ALPHA = length(clamp(ALBEDO, 0.0, 1.0));
+}

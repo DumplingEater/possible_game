@@ -48,7 +48,7 @@ void fragment()
 	q.x *= 1.0;
 	q.y *= 2.0;
 	float strength = floor(q.x+1.);
-	float T3 = max(3.,1.25*strength)*TIME;
+	float T3 = max(3.,1.25*strength)*TIME/2.0;
 	q.x = mod(q.x,1.)-0.5;
 	q.y -= 0.25;
 	float n = fbm(strength*q - vec2(0,T3));
