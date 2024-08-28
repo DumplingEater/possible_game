@@ -89,146 +89,168 @@ func _ready():
 		room_graph[best_graph_node].append(best_candidate_node)
 	
 	print("Building halls from MST Graph...\n\n")
-	# i guess for conceptual sake i am picturing this top down +x to right +z 'up'
 	for room in room_graph:
 		var adjacent_rooms = room_graph[room]
 		for target_room in adjacent_rooms:
-
-			var rooms_overlap_on_x_axis = !(room.max_x() < target_room.min_x() or room.min_x() > target_room.max_x())
-			var rooms_overlap_on_z_axis = !(room.max_z() < target_room.min_z() or room.min_z() > target_room.max_z())
+			var target_room_above: bool = target_room.global_position.z > room.global_position.z
+			var target_room_right: bool = target_room.global_position.x > room.global_position.x
+			var room_x_diff: float = target_room.global_position.x - room.global_position.x
+			var room_z_diff: float = target_room.global_position.z - room.global_position.z
+			var more_horizontally_aligned: bool = abs(room_x_diff) > abs(room_z_diff)
 			
-			var x_overlap_amount = abs(room.max_x() - target_room.min_x()) if rooms_overlap_on_x_axis else 0.0
-			var z_overlap_amount = abs(room.max_z() - target_room.min_z()) if rooms_overlap_on_z_axis else 0.0
-			
-			# if the rooms overlap enough to fit a hall just do a straight hall
-			#region Straight Halls
-			if x_overlap_amount > hall_width + 2 or z_overlap_amount > hall_width + 2:
-				
-				# just line up our 4 x values and sort and our x bounds for hall
-				# pos are the middle two. same for z actually for the bounds of
-				# the hall
-				var x_edges = [room.min_x(), room.max_x(), target_room.min_x(), target_room.max_x()]
-				var z_edges = [room.min_z(), room.max_z(), target_room.min_z(), target_room.max_z()]
-				
-				x_edges.sort()
-				z_edges.sort()
-				
-				var hall_x = (x_edges[1] + x_edges[2]) / 2
-				var hall_z = (z_edges[1] + z_edges[2]) / 2
-				
-				# calculate position and size of hall
-				var hall_size: Vector3 = Vector3(0, 0, 0)
-				if rooms_overlap_on_x_axis:
-					var hall_length = abs(z_edges[1] - z_edges[2])
-					hall_size = Vector3(hall_width, 1.0, hall_length)
-				elif rooms_overlap_on_z_axis:
-					var hall_length = abs(x_edges[1] - x_edges[2])
-					hall_size = Vector3(hall_length, 1.0, hall_width)
-				
-				var hall_position = Vector3(hall_x, 0.0, hall_z)	
-				var hall_room = base_room.instantiate()
-				add_child(hall_room)
-				hall_room.construct_room(hall_position, hall_size)
-				continue
-#endregion
+			# figure out which face the door should be on for each room
+			# face 0, 1, 2, 3 are +z, +x, -z, -x. clockwise starting with up (+z)
+			var face_for_origin_door: int = 0
+			if more_horizontally_aligned:
+				face_for_origin_door = 3 # default left
+				if target_room_right:
+					face_for_origin_door = 1
+			else:
+				face_for_origin_door = 2 # default down
+				if target_room_above:
+					face_for_origin_door = 0
+			# for now just get opposite face for other room
+			var face_for_target_room: int = (face_for_origin_door + 2) % 4
 			
 			
-			# the cases where rooms don't directly overlap correlate
-			# to the target room being off of one of the four corners of this
-			# room, so we need a bent hall
-			
-			var x_diff = abs(room.global_position.x - target_room.global_position.x)
-			var z_diff = abs(room.global_position.z - target_room.global_position.z)
-			
-			# gets closest corner
-			var start_x = min(room.max_x(), target_room.global_position.x)
-			start_x = max(room.min_x(), start_x)
-			var start_z = min(room.max_z(), target_room.global_position.z)
-			start_z = max(room.min_z(), start_z)
-			
-			var should_go_right = bool(target_room.global_position.x > room.global_position.x)
-			var should_go_up = bool(target_room.global_position.z > room.global_position.z)
-			
-			var first_leg_start_position = Vector3()
-			var first_leg_end_position = Vector3()
-			var second_leg_start_position = Vector3()
-			var second_leg_end_position = Vector3()
-			var first_leg_scale = Vector3()
-			var second_leg_scale = Vector3()
-			var first_leg_along_z = false
-			var second_leg_along_z = false
-			if randf_range(0.0, 1.0) < 0.5:
-				# moving in z first, snap x to center
-				first_leg_along_z = true
-				var target_z = target_room.global_position.z
-				start_x = room.global_position.x
-				
-				if should_go_up:
-					first_leg_end_position = Vector3(start_x, 0.0, target_z - hall_width / 2.0)
-				else:
-					first_leg_end_position = Vector3(start_x, 0.0, target_z + hall_width / 2.0)
-				
-				first_leg_start_position = Vector3(start_x, 0.0, start_z)
-				first_leg_scale = Vector3(hall_width, 1.0, abs(first_leg_end_position.z - start_z))
-					
-				var target_x = 0.0
-				if should_go_right:
-					target_x = target_room.min_x()
-					second_leg_start_position = Vector3(start_x + hall_width / 2.0, 0.0, target_z)
-				else:
-					target_x = target_room.max_x()
-					second_leg_start_position = Vector3(start_x - hall_width / 2.0, 0.0, target_z)
-				
-				second_leg_end_position = Vector3(target_x, 0.0, target_z)
-				second_leg_scale = Vector3(abs(second_leg_end_position.x - second_leg_start_position.x), 1.0, hall_width)
-			else:  # going horizontal first
-				second_leg_along_z = true
-				var target_x = target_room.global_position.x
-				start_z = room.global_position.z
-				
-				if should_go_right:
-					first_leg_end_position = Vector3(target_x - hall_width / 2.0, 0.0, start_z)
-				else:
-					first_leg_end_position = Vector3(target_x + hall_width / 2.0, 0.0, start_z)
-				
-				first_leg_start_position = Vector3(start_x, 0.0, start_z)
-				first_leg_scale = Vector3(abs(first_leg_end_position.x - first_leg_start_position.x), 1.0, hall_width)
-				
-				var target_z = 0.0	
-				if should_go_up:
-					target_z = target_room.min_z()
-					second_leg_start_position = Vector3(target_x, 0.0, start_z + hall_width / 2.0)
-				else:
-					target_z = target_room.max_z()
-					second_leg_start_position = Vector3(target_x, 0.0, start_z - hall_width / 2.0)
-				
-				second_leg_end_position = Vector3(target_x, 0.0, target_z)
-				second_leg_scale = Vector3(hall_width, 1.0, abs(second_leg_end_position.z - second_leg_start_position.z))	
-			
-			var first_hall_leg = base_room.instantiate()
-			add_child(first_hall_leg)
-			var first_leg_center = (first_leg_start_position + first_leg_end_position) / 2.0
-			first_hall_leg.height = 1.0
-			first_hall_leg.construct_room(
-				first_leg_center,
-				first_leg_scale,
-				first_leg_along_z,
-				not first_leg_along_z
-			)
-			
-			var second_hall_leg = base_room.instantiate()
-			add_child(second_hall_leg)
-			var second_leg_center = (second_leg_start_position + second_leg_end_position) / 2.0
-			second_hall_leg.construct_room(
-				second_leg_center,
-				second_leg_scale,
-				second_leg_along_z,
-				not second_leg_along_z
-			)
-			
-			#var starting_point: Vector3(start_x, 0.0, start_z)
-			#var elbow_point = Vector3
-	
+	# i guess for conceptual sake i am picturing this top down +x to right +z 'up'
+	#for room in room_graph:
+		#var adjacent_rooms = room_graph[room]
+		#for target_room in adjacent_rooms:
+#
+			#var rooms_overlap_on_x_axis = !(room.max_x() < target_room.min_x() or room.min_x() > target_room.max_x())
+			#var rooms_overlap_on_z_axis = !(room.max_z() < target_room.min_z() or room.min_z() > target_room.max_z())
+			#
+			#var x_overlap_amount = abs(room.max_x() - target_room.min_x()) if rooms_overlap_on_x_axis else 0.0
+			#var z_overlap_amount = abs(room.max_z() - target_room.min_z()) if rooms_overlap_on_z_axis else 0.0
+			#
+			## if the rooms overlap enough to fit a hall just do a straight hall
+			#if x_overlap_amount > hall_width + 2 or z_overlap_amount > hall_width + 2:
+				#
+				## just line up our 4 x values and sort and our x bounds for hall
+				## pos are the middle two. same for z actually for the bounds of
+				## the hall
+				#var x_edges = [room.min_x(), room.max_x(), target_room.min_x(), target_room.max_x()]
+				#var z_edges = [room.min_z(), room.max_z(), target_room.min_z(), target_room.max_z()]
+				#
+				#x_edges.sort()
+				#z_edges.sort()
+				#
+				#var hall_x = (x_edges[1] + x_edges[2]) / 2
+				#var hall_z = (z_edges[1] + z_edges[2]) / 2
+				#
+				## calculate position and size of hall
+				#var hall_size: Vector3 = Vector3(0, 0, 0)
+				#if rooms_overlap_on_x_axis:
+					#var hall_length = abs(z_edges[1] - z_edges[2])
+					#hall_size = Vector3(hall_width, 1.0, hall_length)
+				#elif rooms_overlap_on_z_axis:
+					#var hall_length = abs(x_edges[1] - x_edges[2])
+					#hall_size = Vector3(hall_length, 1.0, hall_width)
+				#
+				#var hall_position = Vector3(hall_x, 0.0, hall_z)	
+				#var hall_room = base_room.instantiate()
+				#add_child(hall_room)
+				#hall_room.construct_room(hall_position, hall_size)
+				#continue
+			#
+			#
+			## the cases where rooms don't directly overlap correlate
+			## to the target room being off of one of the four corners of this
+			## room, so we need a bent hall
+			#
+			#var x_diff = abs(room.global_position.x - target_room.global_position.x)
+			#var z_diff = abs(room.global_position.z - target_room.global_position.z)
+			#
+			## gets closest corner
+			#var start_x = min(room.max_x(), target_room.global_position.x)
+			#start_x = max(room.min_x(), start_x)
+			#var start_z = min(room.max_z(), target_room.global_position.z)
+			#start_z = max(room.min_z(), start_z)
+			#
+			#var should_go_right = bool(target_room.global_position.x > room.global_position.x)
+			#var should_go_up = bool(target_room.global_position.z > room.global_position.z)
+			#
+			#var first_leg_start_position = Vector3()
+			#var first_leg_end_position = Vector3()
+			#var second_leg_start_position = Vector3()
+			#var second_leg_end_position = Vector3()
+			#var first_leg_scale = Vector3()
+			#var second_leg_scale = Vector3()
+			#var first_leg_along_z = false
+			#var second_leg_along_z = false
+			#if randf_range(0.0, 1.0) < 0.5:
+				## moving in z first, snap x to center
+				#first_leg_along_z = true
+				#var target_z = target_room.global_position.z
+				#start_x = room.global_position.x
+				#
+				#if should_go_up:
+					#first_leg_end_position = Vector3(start_x, 0.0, target_z - hall_width / 2.0)
+				#else:
+					#first_leg_end_position = Vector3(start_x, 0.0, target_z + hall_width / 2.0)
+				#
+				#first_leg_start_position = Vector3(start_x, 0.0, start_z)
+				#first_leg_scale = Vector3(hall_width, 1.0, abs(first_leg_end_position.z - start_z))
+					#
+				#var target_x = 0.0
+				#if should_go_right:
+					#target_x = target_room.min_x()
+					#second_leg_start_position = Vector3(start_x + hall_width / 2.0, 0.0, target_z)
+				#else:
+					#target_x = target_room.max_x()
+					#second_leg_start_position = Vector3(start_x - hall_width / 2.0, 0.0, target_z)
+				#
+				#second_leg_end_position = Vector3(target_x, 0.0, target_z)
+				#second_leg_scale = Vector3(abs(second_leg_end_position.x - second_leg_start_position.x), 1.0, hall_width)
+			#else:  # going horizontal first
+				#second_leg_along_z = true
+				#var target_x = target_room.global_position.x
+				#start_z = room.global_position.z
+				#
+				#if should_go_right:
+					#first_leg_end_position = Vector3(target_x - hall_width / 2.0, 0.0, start_z)
+				#else:
+					#first_leg_end_position = Vector3(target_x + hall_width / 2.0, 0.0, start_z)
+				#
+				#first_leg_start_position = Vector3(start_x, 0.0, start_z)
+				#first_leg_scale = Vector3(abs(first_leg_end_position.x - first_leg_start_position.x), 1.0, hall_width)
+				#
+				#var target_z = 0.0	
+				#if should_go_up:
+					#target_z = target_room.min_z()
+					#second_leg_start_position = Vector3(target_x, 0.0, start_z + hall_width / 2.0)
+				#else:
+					#target_z = target_room.max_z()
+					#second_leg_start_position = Vector3(target_x, 0.0, start_z - hall_width / 2.0)
+				#
+				#second_leg_end_position = Vector3(target_x, 0.0, target_z)
+				#second_leg_scale = Vector3(hall_width, 1.0, abs(second_leg_end_position.z - second_leg_start_position.z))	
+			#
+			#var first_hall_leg = base_room.instantiate()
+			#add_child(first_hall_leg)
+			#var first_leg_center = (first_leg_start_position + first_leg_end_position) / 2.0
+			#first_hall_leg.height = 1.0
+			#first_hall_leg.construct_room(
+				#first_leg_center,
+				#first_leg_scale,
+				#first_leg_along_z,
+				#not first_leg_along_z
+			#)
+			#
+			#var second_hall_leg = base_room.instantiate()
+			#add_child(second_hall_leg)
+			#var second_leg_center = (second_leg_start_position + second_leg_end_position) / 2.0
+			#second_hall_leg.construct_room(
+				#second_leg_center,
+				#second_leg_scale,
+				#second_leg_along_z,
+				#not second_leg_along_z
+			#)
+			#
+			##var starting_point: Vector3(start_x, 0.0, start_z)
+			##var elbow_point = Vector3
+	#
 	print("Setting spawn point...")
 	# add rooms as children
 	for room in rooms:
