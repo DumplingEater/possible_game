@@ -7,6 +7,7 @@ var width: float = 0
 var depth: float  = 0
 var height: float = 3
 var entry_points_list = null
+#var walls: list = []
 
 var half_width: float:
 	get:
@@ -43,14 +44,14 @@ func min_z() -> float:
 func max_z() -> float:
 	return self.global_transform.origin.z + (self.depth / 2.0)
 
-func overlaps_room(other: BaseRoom) -> bool:
-	if other.max_x() < self.min_x():
+func overlaps_room(other: BaseRoom, padding: float = 0.0) -> bool:
+	if other.max_x() < (self.min_x() - padding):
 		return false
-	if other.min_x() > self.max_x():
+	if other.min_x() > (self.max_x() + padding):
 		return false
-	if other.max_z() < self.min_z():
+	if other.max_z() < (self.min_z() - padding):
 		return false
-	if other.min_z() > self.max_z():
+	if other.min_z() > (self.max_z() + padding):
 		return false
 	return true
 	
@@ -66,7 +67,7 @@ func construct_room(room_position: Vector3, room_scale: Vector3,
 	self.depth = room_scale.z
 	
 	build_floor(room_scale)
-	build_walls(build_x_walls, build_z_walls)
+	#build_walls(build_x_walls, build_z_walls)
 	
 func build_floor(room_scale: Vector3):
 	var floor = building_block.instantiate()

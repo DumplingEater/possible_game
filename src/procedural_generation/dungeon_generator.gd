@@ -5,13 +5,13 @@ extends Node3D
 @export var min_room_size: int = 15
 @export var max_room_size: int = 70
 @export var room_count: int = 20
-@export var max_iterations: int = 100000
-@export var hall_width: float = 5
+@export var max_iterations: int = 10000
+@export var hall_width: float = 6
 
 @export var base_room: PackedScene = null
 
 var char_spawn_point: Vector3 = Vector3.ZERO
-
+var rng = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -19,14 +19,14 @@ func _ready():
 	var spawn_set = false
 	
 	print("Building rooms...")
-	var rng = RandomNumberGenerator.new()
+	rng = RandomNumberGenerator.new()
 	var rooms = []
-	var iterations = 0
+	var iterations: int = 0
 	while len(rooms) < room_count:
 		var x: int = rng.randi_range(-grid_size, grid_size)
 		var z: int = rng.randi_range(-grid_size, grid_size)
-		var dx: float = rng.randi_range(min_room_size, max_room_size)
-		var dz: float = rng.randi_range(min_room_size, max_room_size)
+		var dx: int = rng.randi_range(min_room_size, max_room_size)
+		var dz: int = rng.randi_range(min_room_size, max_room_size)
 		
 		var candidate_room = base_room.instantiate()
 		var room_position: Vector3 = Vector3(x, 0.0, z)
@@ -37,7 +37,7 @@ func _ready():
 		# see if this room overlaps an existing room, and if so, free it
 		var room_overlaps: bool = false
 		for room in rooms:
-			if room.overlaps_room(candidate_room):
+			if room.overlaps_room(candidate_room, hall_width):
 				room_overlaps = true
 				candidate_room.free()
 				break
@@ -111,6 +111,40 @@ func _ready():
 					face_for_origin_door = 0
 			# for now just get opposite face for other room
 			var face_for_target_room: int = (face_for_origin_door + 2) % 4
+			var corner_offset: int = int(hall_width / 2.0)
+			
+			var start_xz: Array[float] = [0, 0]
+			start_xz = _calculate_door_position(
+				room,
+				face_for_origin_door,
+				corner_offset,
+				hall_width
+			)
+			
+			var end_xz: Array[float] = [0, 0]
+			end_xz = _calculate_door_position(
+				target_room,
+				face_for_target_room,
+				corner_offset,
+				hall_width
+			)
+			
+			var door = base_room.instantiate()
+			add_child(door)
+			var p = Vector3(start_xz[0], 0.0, start_xz[1])
+			door.height = 10.0
+			door.construct_room(
+				p,
+				Vector3(hall_width, 10, hall_width),
+			)
+			var door2 = base_room.instantiate()
+			add_child(door2)
+			var p2 = Vector3(end_xz[0], 0.0, end_xz[1])
+			door2.height = 10.0
+			door2.construct_room(
+				p2,
+				Vector3(hall_width, 10, hall_width),
+			)
 			
 			
 	# i guess for conceptual sake i am picturing this top down +x to right +z 'up'
@@ -262,6 +296,50 @@ func _ready():
 	
 	var character = get_node("../../agents/players/character")
 	character.ready.connect(_set_player_spawn)
+
+func _calculate_door_position(room, face: int,
+corner_offset: int, hall_width: int) -> Array[float]:
+	var start_door_x: float = 0
+	var start_door_z: float = 0
+	var half_width: float = hall_width / 2
+	
+	# top or bottom case
+	if face == 0 or face == 2:
+		start_door_z = room.min_z() - half_width
+		if face == 0:
+			start_door_z = room.max_z() + half_width
+		start_door_x = rng.randi_range(
+			room.min_x() + corner_offset,
+			room.max_x() - corner_offset
+		)
+	else:  # left / right cases
+		start_door_x = room.min_x() - half_width
+		if face == 1:
+			start_door_x = room.max_x() + half_width
+		start_door_z = rng.randi_range(
+			room.min_z() + corner_offset,
+			room.max_z() - corner_offset
+		)
+	return [start_door_x, start_door_z]
+
+func _calculate_hall_nodes(
+	start_xz: Array[float],
+	end_xz: Array[float],
+	rooms
+	):
+	var weight_func = func _predict_weight(
+		candidate_x: float, candidate_z: float,
+		target_x: float, target_z: float,
+		rooms,
+		hall_width
+		) -> float:
+		var dx: float = candidate_x - target_x
+		var dz: float = candidate_z - target_z
+		var dist_squared: float = dx * dx + dz * dz
+		var dist = sqrt(dist_squared)
+		
+		return dist
+	return
 
 func _set_player_spawn():
 	var character = get_node("../../agents/players/character")
