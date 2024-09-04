@@ -216,7 +216,6 @@ func _calculate_hall_nodes(
 	rooms,
 	halls
 ):
-	var walker_xz: Vector2 = Vector2(start_xz[0], start_xz[1])
 	
 	var move_option_deltas: Array[Vector2] = [
 		Vector2(0, 1),
@@ -230,8 +229,13 @@ func _calculate_hall_nodes(
 	# iterate until the node is within one step of the finish
 	var current_direction: int = -1
 	var hall_nodes = []
+
+	var walker_xz: Vector2 = Vector2(start_xz[0], start_xz[1])
+	var visited_nodes = [walker_xz]
+
 	print("Start Node: ", start_xz, " End Node: ", target_xz)
 	var iterations = 0
+	
 	while not _is_near_end(walker_xz, target_xz):
 		print("Walker position: ", walker_xz)
 		var best_index: int = -1
@@ -243,6 +247,9 @@ func _calculate_hall_nodes(
 		for delta_index in range(move_option_deltas.size()):
 			var delta: Vector2 = move_option_deltas[int(delta_index)]
 			var candidate_xz: Vector2 = walker_xz + delta
+			if candidate_xz in visited_nodes:
+				print("We've already been here idiot")
+				continue
 			var candidate_node_count = hall_nodes.size() + 1
 			if delta_index != current_direction: candidate_node_count += 1
 			var heuristic_weight: float = _heuristic_weight(
@@ -262,7 +269,8 @@ func _calculate_hall_nodes(
 				best_delta = delta
 		iterations += 1
 		if iterations == 1000:
-			return []
+			#return []
+			break
 		
 		#print("went: ", directions[best_index], " 	Best weight: ", best_weight, " Best Index: ", best_index, " Best Candidate: ", best_candidate, " Best Delta: ", best_delta)
 		
@@ -279,6 +287,7 @@ func _calculate_hall_nodes(
 		
 		# go ahead and move
 		walker_xz = best_candidate
+		visited_nodes += [walker_xz]
 		
 	hall_nodes += [target_xz]
 	return hall_nodes
