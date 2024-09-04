@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://xw4tvyyb2j1h"]
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_00qgf"]
+
+[node name="Sandbox" type="Node3D"]
+
+[node name="CSGMesh3D" type="CSGMesh3D" parent="."]
+mesh = SubResource("ArrayMesh_00qgf")

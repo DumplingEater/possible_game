@@ -7,6 +7,6 @@
 
 [node name="dungeon_spawner" type="Node3D" parent="."]
 script = ExtResource("1_14uwh")
-min_room_size = 30
-room_count = 30
+room_count = 25
+max_iterations = 1000
 base_room = ExtResource("2_6wpme")
