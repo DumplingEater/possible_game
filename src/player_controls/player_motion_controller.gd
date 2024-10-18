@@ -78,4 +78,3 @@ func _input(event):
 			# Create a quaternion for the rotation around the Y-axis (up vector)
 			var rot_about_y = Quaternion(Vector3(0, 1, 0), delta_x)
 			self.rotate_object_local(Vector3(0, 1, 0), delta_x)
-

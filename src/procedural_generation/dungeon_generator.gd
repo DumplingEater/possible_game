@@ -151,9 +151,9 @@ func _ready():
 				)
 			
 			var N = hall_nodes.size()
-			print("Got some hall nodes %d: " % N, hall_nodes)
+			#print("Got some hall nodes %d: " % N, hall_nodes)
 			for i in range(1, N):
-				print("Adding leg")
+				#print("Adding leg")
 				var start_node = hall_nodes[i - 1]
 				var end_node = hall_nodes[i]
 				var center: Vector3 = Vector3(
@@ -163,7 +163,7 @@ func _ready():
 				)
 				var dx = max(1, abs(start_node[0] - end_node[0]))# + hall_width
 				var dz = max(1, abs(start_node[1] - end_node[1]))# + hall_width
-				print("dx %-5.2f dz %-5.2f" % [dx, dz])
+				#print("dx %-5.2f dz %-5.2f" % [dx, dz])
 				var size = Vector3(dx, 0.1, dz)
 				var hall_leg = base_room.instantiate()
 				add_child(hall_leg)
@@ -237,7 +237,7 @@ func _calculate_hall_nodes(
 	var iterations = 0
 	
 	while not _is_near_end(walker_xz, target_xz):
-		print("Walker position: ", walker_xz)
+		#print("Walker position: ", walker_xz)
 		var best_index: int = -1
 		var best_weight: float = 1e9
 		var best_delta: Vector2 = Vector2()
@@ -248,7 +248,6 @@ func _calculate_hall_nodes(
 			var delta: Vector2 = move_option_deltas[int(delta_index)]
 			var candidate_xz: Vector2 = walker_xz + delta
 			if candidate_xz in visited_nodes:
-				print("We've already been here idiot")
 				continue
 			var candidate_node_count = hall_nodes.size() + 1
 			if delta_index != current_direction: candidate_node_count += 1
@@ -259,9 +258,9 @@ func _calculate_hall_nodes(
 			var weight_from_start: float = start_xz.distance_to(candidate_xz)
 			
 			var predicted_weight: float = weight_from_start + heuristic_weight
-			print("g(n): %10.5f + h(n): %10.5f = %10.5f at index %d with delta %5.1f, %5.1f, candidate: %5.1f, %5.1f, candidate node count %d" % \
-			[weight_from_start, heuristic_weight, predicted_weight, delta_index,
-			delta[0], delta[1], candidate_xz[0], candidate_xz[1], candidate_node_count])
+			#print("g(n): %10.5f + h(n): %10.5f = %10.5f at index %d with delta %5.1f, %5.1f, candidate: %5.1f, %5.1f, candidate node count %d" % \
+			#[weight_from_start, heuristic_weight, predicted_weight, delta_index,
+			#delta[0], delta[1], candidate_xz[0], candidate_xz[1], candidate_node_count])
 			if predicted_weight <= best_weight:
 				best_weight = predicted_weight
 				best_index = int(delta_index)
