@@ -36,11 +36,17 @@ func _get_mouse_build_pos() -> Vector3:
 	var to = from + cam_node.project_ray_normal(get_viewport().get_mouse_position()) * 1000
 	var query = PhysicsRayQueryParameters3D.create(from, to)
 	query.collide_with_bodies = true
+	var position: Vector3 = Vector3(0, 0, 0)
 	var result = get_parent().get_world_3d().direct_space_state.intersect_ray(query)
-
-	if result:
-		return result.position
-	return Vector3(0, 0, 0)
+	if not result:
+		return position
+	
+	position = result.position
+	if Input.is_action_pressed("snap_to_grid"):
+		var x: float = float(int(position.x))
+		var z: float = float(int(position.z))
+		position = Vector3(x, position.y, z)
+	return position
 
 func _enter_build_mode() -> void:
 	self.current_buildable = test_cube.instantiate()
@@ -49,6 +55,7 @@ func _enter_build_mode() -> void:
 	self.current_buildable.global_position = buildable_pos
 
 func _exit_build_mode() -> void:
+	remove_child(self.current_buildable)
 	self.current_buildable = null
 
 func _draw_current_buildable(delta: float) -> void:
