@@ -10,6 +10,9 @@ var states = {}
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	super._ready()
+
+func start():
+	self.started = true
 	get_states_from_children()
 	if initial_state != null:
 		change_state(initial_state.name)
@@ -35,6 +38,8 @@ func get_states_from_children():
 		print("state_name: ", state_name, " value: ", state)
 
 func process_current_state(delta):
+	if not self.started:
+		return
 	if current_state != null:
 		current_state.process_state(delta)
 

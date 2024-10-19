@@ -1,8 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://cx6470uohatbh"]
+[gd_scene load_steps=7 format=3 uid="uid://cx6470uohatbh"]
 
 [ext_resource type="PackedScene" uid="uid://b5jpr0o1187hx" path="res://resources/scenes/dungeon_level.tscn" id="1_n2dcx"]
 [ext_resource type="PackedScene" uid="uid://bkee16cpy3j8y" path="res://resources/scenes/third_person_character.tscn" id="2_8juhv"]
-[ext_resource type="Script" path="res://src/buildable_container.gd" id="3_lg1od"]
+[ext_resource type="PackedScene" uid="uid://crp1lhoxkc2nc" path="res://resources/scenes/building.tscn" id="3_42dw1"]
+[ext_resource type="PackedScene" uid="uid://bxodjhxqkdukg" path="res://resources/scenes/ui/building/build_ui.tscn" id="4_dd34p"]
+[ext_resource type="Script" path="res://src/ui/ui_manager.gd" id="4_pg6kc"]
 
 [sub_resource type="PrismMesh" id="PrismMesh_qpu2j"]
 
@@ -39,22 +41,26 @@ transform = Transform3D(10, 0, 0, 0, 67.7377, -7.35636, 0, 73.5636, 6.77377, 500
 mesh = SubResource("PrismMesh_qpu2j")
 skeleton = NodePath("../..")
 
-[node name="Node3D" type="Node3D" parent="."]
+[node name="z" type="Node3D" parent="."]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="z"]
 transform = Transform3D(0.200463, 99.8504, -0.508678, -0.202545, 5.12733, 9.98479, 9.99594, -1.89855, 0.212521, 0, 35.2528, 500)
 mesh = SubResource("PrismMesh_qpu2j")
 skeleton = NodePath("../..")
 
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="Node3D"]
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="z"]
 transform = Transform3D(0.284974, -73.5337, -6.77102, 0, 67.7377, -7.35636, 9.99594, 2.09637, 0.193035, 0, 0, 500)
 mesh = SubResource("PrismMesh_qpu2j")
 skeleton = NodePath("../..")
 
-[node name="MeshInstance3D3" type="MeshInstance3D" parent="Node3D"]
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="z"]
 transform = Transform3D(0.200463, 99.8504, -0.508678, -0.202545, 5.12733, 9.98479, 9.99594, -1.89855, 0.212521, 0, -32.8357, 500)
 mesh = SubResource("PrismMesh_qpu2j")
 skeleton = NodePath("../..")
 
-[node name="built_items" type="Node" parent="."]
-script = ExtResource("3_lg1od")
+[node name="building" parent="." instance=ExtResource("3_42dw1")]
+
+[node name="ui" type="Node" parent="."]
+script = ExtResource("4_pg6kc")
+
+[node name="build_ui" parent="ui" instance=ExtResource("4_dd34p")]

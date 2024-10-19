@@ -1,0 +1,27 @@
+[gd_scene load_steps=2 format=3 uid="uid://bxodjhxqkdukg"]
+
+[ext_resource type="Script" path="res://src/ui/build_menu_ui.gd" id="1_30whf"]
+
+[node name="build_ui_root" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_30whf")
+
+[node name="debug_texxt" type="Label" parent="."]
+layout_mode = 0
+offset_left = 500.0
+offset_top = 116.0
+offset_right = 659.0
+offset_bottom = 143.0
+text = "build ui visible: True"
+
+[node name="buildable_grid" type="GridContainer" parent="."]
+layout_mode = 0
+offset_left = 394.0
+offset_top = 158.0
+offset_right = 775.0
+offset_bottom = 440.0

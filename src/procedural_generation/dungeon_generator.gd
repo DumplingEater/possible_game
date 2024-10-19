@@ -93,7 +93,7 @@ func _ready():
 		# track of it as a directed graph so it's easier to know which edges i've added
 		room_graph[best_graph_node].append(best_candidate_node)
 	
-	print("Building halls from MST Graph...\n\n")
+	print("Building halls from MST Graph...")
 	for room in room_graph:
 		var adjacent_rooms = room_graph[room]
 		for target_room in adjacent_rooms:
@@ -233,7 +233,7 @@ func _calculate_hall_nodes(
 	var walker_xz: Vector2 = Vector2(start_xz[0], start_xz[1])
 	var visited_nodes = [walker_xz]
 
-	print("Start Node: ", start_xz, " End Node: ", target_xz)
+	#print("Start Node: ", start_xz, " End Node: ", target_xz)
 	var iterations = 0
 	
 	while not _is_near_end(walker_xz, target_xz):
@@ -348,11 +348,11 @@ func _set_player_spawn():
 	var character = get_node("../../agents/players/character")
 	character.transform = character.transform.translated(char_spawn_point)
 	
-	var test_enemy = preload("res://resources//scenes//test_enemy.tscn")
-	var instance =  test_enemy.instantiate()
-	instance.transform.origin = Vector3(char_spawn_point.x + 6, 5, char_spawn_point.z)
-	var mobs = get_node("../../agents/mobs")
-	mobs.add_child(instance)
+	#var test_enemy = preload("res://resources//scenes//test_enemy.tscn")
+	#var instance =  test_enemy.instantiate()
+	#instance.transform.origin = Vector3(char_spawn_point.x + 6, 5, char_spawn_point.z)
+	#var mobs = get_node("../../agents/mobs")
+	#mobs.add_child(instance)
 	return
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.

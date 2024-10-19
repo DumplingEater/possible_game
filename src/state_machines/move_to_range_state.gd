@@ -39,4 +39,3 @@ func process_state(delta):
 	direction = direction.normalized()
 	state_machine.agent_body.set_velocity(direction * state_machine.speed)
 	state_machine.agent_body.move_and_slide()
-

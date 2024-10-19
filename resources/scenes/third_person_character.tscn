@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://bkee16cpy3j8y"]
+[gd_scene load_steps=11 format=3 uid="uid://bkee16cpy3j8y"]
 
 [ext_resource type="Script" path="res://src/agent_data.gd" id="1_jv2i5"]
 [ext_resource type="Script" path="res://src/player_controls/player_motion_controller.gd" id="1_vvahs"]
@@ -6,7 +6,6 @@
 [ext_resource type="Script" path="res://src/spellbook.gd" id="2_h3wa7"]
 [ext_resource type="PackedScene" uid="uid://bablflwgqpj8o" path="res://resources/scenes/fireball.tscn" id="3_mvmjn"]
 [ext_resource type="Script" path="res://src/player_controls/player_combat_controller.gd" id="4_10ram"]
-[ext_resource type="PackedScene" uid="uid://bj2fkhwbgremr" path="res://resources/scenes/player_ui.tscn" id="4_q4vam"]
 [ext_resource type="Script" path="res://src/player_controls/player_building_controller.gd" id="5_1eva7"]
 [ext_resource type="PackedScene" uid="uid://bi2yn1jxkn1yn" path="res://resources/scenes/buildables/architecture/cube.tscn" id="6_i7o6c"]
 
@@ -30,13 +29,6 @@ script = ExtResource("4_10ram")
 [node name="building_controller" type="Node" parent="."]
 script = ExtResource("5_1eva7")
 test_cube = ExtResource("6_i7o6c")
-
-[node name="ui" parent="." instance=ExtResource("4_q4vam")]
-
-[node name="building_ui" type="Control" parent="ui"]
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
 
 [node name="body_3d" type="CharacterBody3D" parent="."]
 script = ExtResource("1_vvahs")
