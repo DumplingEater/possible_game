@@ -8,15 +8,19 @@ var ui_open: bool = false
 var current_buildable_scene: PackedScene = null
 var current_buildable: Node = null
 @export var buildable_node_target: Node = null
-var cam_node: Node = null
 @export var test_cube : PackedScene
 
+var cam_node: Node = null
+var parent_rid = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	cam_node = get_parent().get_node("body_3d/camera")
+	self.cam_node = get_parent().get_node("body_3d/camera")
 	get_node("/root/main/ui/build_ui").connect("set_buildable", self._on_buildable_set)
+	self.parent_rid = get_parent().get_node("body_3d").get_rid()
+	
 	self.current_buildable_scene = self.test_cube
+	self._set_buildable()
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -55,6 +59,14 @@ func _get_mouse_build_pos() -> Vector3:
 	var from = cam_node.project_ray_origin(get_viewport().get_mouse_position())
 	var to = from + cam_node.project_ray_normal(get_viewport().get_mouse_position()) * 1000
 	var query = PhysicsRayQueryParameters3D.create(from, to)
+		
+	if self.building and self.current_buildable:
+		var excludes = []
+		var physics_children = self.current_buildable.find_children("*?", "CollisionObject3D")
+		for child in physics_children:
+			excludes.append(child.get_rid())
+		query.exclude = excludes
+	
 	query.collide_with_bodies = true
 	var position: Vector3 = Vector3(0, 0, 0)
 	var result = get_parent().get_world_3d().direct_space_state.intersect_ray(query)

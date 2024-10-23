@@ -15,7 +15,7 @@ func _ready():
 	super._ready()
 	var start_pos = get_parent().global_transform.origin
 	original_position = Vector3(start_pos.x, 0.0, start_pos.z)
-	agent_body = get_parent().get_node("body_3d")
+	agent_body = get_parent().get_node("body")
 	agent_data = get_parent().get_node("data")
 
 func _process(delta: float):

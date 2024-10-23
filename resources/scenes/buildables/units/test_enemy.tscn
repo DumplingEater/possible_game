@@ -44,13 +44,13 @@ script = ExtResource("7_ahk1a")
 [node name="return_to_origin" type="Node" parent="state_machine"]
 script = ExtResource("8_nqklu")
 
-[node name="body_3d" type="CharacterBody3D" parent="."]
+[node name="body" type="CharacterBody3D" parent="."]
 script = ExtResource("9_ia1wn")
 
-[node name="collision_shape_3d" type="CollisionShape3D" parent="body_3d"]
+[node name="collision_shape_3d" type="CollisionShape3D" parent="body"]
 shape = SubResource("CylinderShape3D_hnul1")
 
-[node name="mesh_3d" type="MeshInstance3D" parent="body_3d"]
+[node name="mesh_3d" type="MeshInstance3D" parent="body"]
 mesh = SubResource("CylinderMesh_btp1y")
 skeleton = NodePath("../..")
 
